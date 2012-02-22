@@ -20,8 +20,9 @@ public class Day {
 	 * generate string from date
 	 */
 	public String getDateString(){
+		int month = mCalendar.get(Calendar.MONTH) + 1;
 		return mCalendar.get(Calendar.YEAR) + "-" + 
-				mCalendar.get(Calendar.MONTH) + "-" + 
+				month + "-" + 
 				mCalendar.get(Calendar.DAY_OF_MONTH);
 	}
 	public String getTimeString(){

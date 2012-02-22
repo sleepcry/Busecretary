@@ -1,8 +1,5 @@
 package com.chaos.sleepcry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum DayDisplay {
 	TODAY("today"),TOMORROW("tomorrow"),OTHER("");
 	private String mDay;
