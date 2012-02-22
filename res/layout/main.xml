@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_date"
+        />
+    <Button
+        android:id="@+id/btn_date_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    	android:textSize="20dp"
+        android:text="today" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC" />
+    
+	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_time"
+        />
+    <Button
+        android:id="@+id/btn_time_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="17:24:30" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC" />
+    
+	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_desc"
+        />
+    <EditText
+        android:id="@+id/et_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="call my mom" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC" />
+    
+	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_ring"
+        />
+    <Button
+        android:id="@+id/btn_ring_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="my heart will go on" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC" />
+    
+	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_categ"
+        />
+    <Button
+        android:id="@+id/btn_repeat_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="none" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC" />
+
+</LinearLayout>
