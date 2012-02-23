@@ -2,82 +2,151 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@drawable/cartoon_grassplain"
+    >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_date"
-        />
-    <Button
-        android:id="@+id/btn_date_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    	android:textSize="20dp"
-        android:text="today" />
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/str_date"
+	        android:textColor="#000" 
+	        />
+
+	    <Button
+	        android:id="@+id/btn_date_desc"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:text="today"
+	        android:textSize="20dp" 
+	        />
+	</LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#CCC" />
-    
-	<TextView
+    
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/str_time"
-        />
-    <Button
-        android:id="@+id/btn_time_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="17:24:30" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_time"
+            android:textColor="#000" />
+
+        <Button
+            android:id="@+id/btn_time_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+	        android:layout_weight="1"
+            android:text="17:24:30"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCC" />
     
 	<TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/str_desc"
+        android:textColor="#000"
         />
     <EditText
         android:id="@+id/et_desc"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="call my mom" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-    
-	<TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_ring"
-        />
-    <Button
-        android:id="@+id/btn_ring_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="my heart will go on" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-    
-	<TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_categ"
-        />
-    <Button
-        android:id="@+id/btn_repeat_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="none" />
+        android:layout_height="60dp"
+    	android:textSize="20dp"
+        android:text="call my mom tonight" 
+        android:gravity="left"
+        android:selectAllOnFocus="true"
+         />
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#CCC" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_ring"
+            android:textColor="#000" />
+
+        <Button
+            android:id="@+id/btn_ring_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="my heart will go on"
+	        android:layout_weight="1"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCC" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_categ"
+            android:textColor="#000" />
+
+        <Button
+            android:id="@+id/btn_repeat_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+	        android:layout_weight="1"
+            android:text="none"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_gravity="bottom"
+        android:layout_weight="1"
+	    >
+		<Button 
+			android:id="@+id/btn_previous"
+        	android:layout_weight="0.3"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+    		android:textSize="20dp"
+        	android:text="previous" 
+        	android:layout_gravity="bottom"
+        />    
+        <Button 
+			android:id="@+id/btn_next"
+        	android:layout_weight="0.3"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+    		android:textSize="20dp"
+        	android:text="next" 
+        	android:layout_gravity="bottom"
+        />   
+	</LinearLayout>
 </LinearLayout>

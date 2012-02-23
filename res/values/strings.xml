@@ -3,9 +3,9 @@
 
     <string name="hello">Hello World, BusecretaryActivity!</string>
     <string name="app_name">Busecretary</string>
-	<string name="str_date">date</string>
-	<string name="str_time">time</string>
-	<string name="str_desc">description</string>
-	<string name="str_ring">ring</string>
-	<string name="str_categ">category</string>
+	<string name="str_date">Date</string>
+	<string name="str_time">Time</string>
+	<string name="str_desc">Description</string>
+	<string name="str_ring">Ring</string>
+	<string name="str_categ">Category</string>
 </resources>

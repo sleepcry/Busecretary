@@ -1,7 +1,9 @@
 package com.chaos.sleepcry;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -12,9 +14,10 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -125,15 +128,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 			timepicker.show();
 			break;
 		case R.id.btn_ring_desc:
-//			Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 
-//					new String[]{MediaStore.Audio.Media.TITLE},
-//					MediaStore.Audio.Media.IS_MUSIC 	+ "=1",null,null);
-//			cursor.moveToFirst();
-//			List<String> lstRing = new ArrayList<String>();
-//			while(!cursor.isNull(0)){
-//				lstRing.add(cursor.getString(0));
-//				cursor.moveToNext();
-//			}
 			Intent intent = new Intent();
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			intent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -203,9 +197,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 			bRepeat = false;
 			break;
 		}
-//		cal.setTimeInMillis(System.currentTimeMillis());
-//		cal.add(Calendar.MINUTE, 1);
-//		triggerTime = cal.getTimeInMillis();
 		int month = cal.get(Calendar.DAY_OF_MONTH) + 1;
 		Toast.makeText(this,""+cal.get(Calendar.YEAR)+"-"+
 				cal.get(Calendar.MONTH)+ "-" + 
@@ -230,13 +221,25 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 		case 0: //retrieve music
 			mCurNoti.ring = data.getDataString();
 			switchNotif(null);
+			updateUI();
 			break;
 		}
 	}
 	private void updateUI(){
 		mBtnDateDesc.setText(mCurNoti.day.getDateString());
 		mBtnTimeDesc.setText(mCurNoti.day.getTimeString());
-		//mBtnRingDesc
+		if(mCurNoti.ring != null)
+		{
+			Uri ring = Uri.parse(mCurNoti.ring);
+			Cursor cursor = getContentResolver().query(
+					ring,
+					new String[] { MediaStore.Audio.Media.TITLE },
+					null, null, null);
+			cursor.moveToFirst();
+			if(!cursor.isNull(0)){
+				mBtnRingDesc.setText(cursor.getString(0));				
+			}
+		}
 		mBtnRepeatDesc.setText(mCurNoti.category.getDesc());
 	}
 }

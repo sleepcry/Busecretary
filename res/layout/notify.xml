@@ -2,13 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@drawable/cartoon_grassplain"
+    >
     
 	<TextView
 		android:id="@+id/tv_notify_msg"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_weight="0.8"
+        android:textColor="#000"
+    	android:textSize="30dp"
 		/>
 	<LinearLayout 
 		android:layout_width="match_parent"
@@ -22,6 +26,7 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="0.5"
 			android:text="confirm"
+    		android:textSize="20dp"
 		/>
 		<Button
 			android:id="@+id/btn_delay"
@@ -29,6 +34,7 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="0.5"
 			android:text="delay"
+    		android:textSize="20dp"
 		/>
 	</LinearLayout>
 </LinearLayout>
