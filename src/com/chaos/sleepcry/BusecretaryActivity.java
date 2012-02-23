@@ -35,6 +35,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 	private Button mBtnTimeDesc = null; //describe the time on the day
 	private Button mBtnRingDesc = null; //describe the notification ring
 	private Button mBtnRepeatDesc = null; //describe the repeat pattern
+	private Button mBtnPrevious = null;
+	private Button mBtnNext = null;
 	private EditText mEtDesc = null; //describe the notification content
 	/*@}
 	 * 
@@ -43,27 +45,35 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 	/*
 	 * the date used to define a notification
 	 */
-	private class NotificationData{
+	public static class NotificationData{
+		public int mId;
 		public Day day;
 		public String desc;
 		public String ring;
 		public RepeatCategory category;
 		public NotificationData(){
+			this(0);
+		}
+		public NotificationData(int id){
+			mId = id;
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(System.currentTimeMillis());
-			day = new Day(cal,DayDisplay.TODAY);
-			desc = new String("call my mom");
+			day = new Day(cal);
+			desc = new String("type your description here");
 			ring = null;
 			category = RepeatCategory.NONE;
 		}
 	}
 	private NotificationData mCurNoti = null;	//the notification currently edit on 
+	private NotifyDatabase mDB = null;
+	private List<NotificationData> mLstNotis = null;
 	/*@{
 	 * fields definition
 	 */
 	public static final String DESC = "desc";
 	public static final String RING = "ring";
 	public static final String CATEGORY = "category";
+	public static final String DAY = "day";
 	/*@}
 	 * 
 	 */
@@ -83,16 +93,41 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
         mBtnRingDesc.setOnClickListener(this);
         mBtnRepeatDesc = (Button)this.findViewById(R.id.btn_repeat_desc);
         mBtnRepeatDesc.setOnClickListener(this);
+        mBtnPrevious = (Button)this.findViewById(R.id.btn_previous);
+        mBtnPrevious.setOnClickListener(this);
+        mBtnNext = (Button)this.findViewById(R.id.btn_next);
+        mBtnNext.setOnClickListener(this);
         mEtDesc = (EditText)this.findViewById(R.id.et_desc);    
         /*@}
          * 
          */
-        mCurNoti = new NotificationData();
-        updateUI();
+        mDB = new NotifyDatabase(this,1);
+        mLstNotis = mDB.query(System.currentTimeMillis());
+        //if the list has not been built
+        if(mLstNotis == null){
+        	mLstNotis = new ArrayList<NotificationData>();
+        	NotificationData data = new NotificationData(0);
+        	mLstNotis.add(data);
+    		mCurNoti = data;
+        	notifyUI(data);
+        }
+        //if gotten nothing from the database,the first time run this program,for example.
+        else if (mLstNotis.size() == 0){
+        	NotificationData data = new NotificationData(0);
+        	mLstNotis.add(data);
+    		mCurNoti = data;
+        	notifyUI(data);
+        }
+        //if found something,at least one record
+        else{
+    		mCurNoti = mLstNotis.get(0);
+        	notifyUI(mCurNoti);
+        }
     }
 	@Override
 	public void onClick(View v) {
 		int nID = v.getId();
+		int location = -1;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		switch(nID){
@@ -148,6 +183,36 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 								}
 							}).setTitle("").create();
 			dlg.show();
+			break;
+		case R.id.btn_previous:
+			location = mLstNotis.indexOf(mCurNoti);
+			//if this is not the first one, then move back
+			if(location > 1){
+				location -= 1;
+				NotificationData data = mLstNotis.get(location);
+				switchNotif(data);
+				notifyUI(data);
+			}
+			break;
+		case R.id.btn_next:
+			location = mLstNotis.indexOf(mCurNoti);
+			//the one must be found,or else, it`s exception
+			if (location != -1) { 
+				//if this is not the last one, then move to next
+				if (location < mLstNotis.size() - 1) {
+					location += 1;
+					NotificationData data = mLstNotis.get(location);
+					switchNotif(data);
+					notifyUI(data);
+				}
+				// if this is the last one
+				else {
+					NotificationData data = new NotificationData(mLstNotis.get(mLstNotis.size()-1).mId + 1);
+					mLstNotis.add(data);
+					switchNotif(data);
+					notifyUI(data);
+				}
+			}
 			break;
 			default:
 				break;
@@ -208,8 +273,17 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 			am.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, interval, pIntent);
 		}else{
 			am.set(AlarmManager.RTC_WAKEUP,triggerTime,pIntent);
-			//this.startActivity(intent);
 		}
+		
+		/*
+		 * save the current notification
+		 */
+		mDB.insert(mCurNoti.mId,mCurNoti.day.getCalendar().getTimeInMillis(), 
+				mCurNoti.desc, mCurNoti.ring, mCurNoti.category.getId());
+		//move to next
+		mCurNoti = data;
+		//update the UI with new data
+		notifyUI(mCurNoti);
 		
 	}
 	@Override
@@ -220,17 +294,19 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 		switch(requestCode){
 		case 0: //retrieve music
 			mCurNoti.ring = data.getDataString();
-			switchNotif(null);
 			updateUI();
 			break;
 		}
 	}
-	private void updateUI(){
-		mBtnDateDesc.setText(mCurNoti.day.getDateString());
-		mBtnTimeDesc.setText(mCurNoti.day.getTimeString());
-		if(mCurNoti.ring != null)
+	private void notifyUI(NotificationData data){
+		if(data == null){
+			return;
+		}
+		mBtnDateDesc.setText(data.day.getDateString());
+		mBtnTimeDesc.setText(data.day.getTimeString());
+		if(data.ring != null)
 		{
-			Uri ring = Uri.parse(mCurNoti.ring);
+			Uri ring = Uri.parse(data.ring);
 			Cursor cursor = getContentResolver().query(
 					ring,
 					new String[] { MediaStore.Audio.Media.TITLE },
@@ -239,7 +315,12 @@ public class BusecretaryActivity extends Activity implements OnClickListener{
 			if(!cursor.isNull(0)){
 				mBtnRingDesc.setText(cursor.getString(0));				
 			}
+		}else{
+			mBtnRingDesc.setText("choose a ring here...");
 		}
-		mBtnRepeatDesc.setText(mCurNoti.category.getDesc());
+		mBtnRepeatDesc.setText(data.category.getDesc());
+	}
+	private void updateUI(){
+		notifyUI(mCurNoti);
 	}
 }

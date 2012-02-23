@@ -6,14 +6,34 @@ import java.util.Date;
 public class Day {
 	private Calendar mCalendar = null;
 	private DayDisplay mDisp;
-	public Day(Date date,DayDisplay disp){
+	public Day(Date date){
 		this.mCalendar = Calendar.getInstance();
 		mCalendar.setTime(date);
-		this.mDisp = disp;
+		Calendar today = Calendar.getInstance();
+		today.setTime(new Date());
+		if(mCalendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) &&
+				mCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+				mCalendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)) {
+			mDisp = DayDisplay.TODAY;
+		}else if(mCalendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) + 1 &&
+				mCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+				mCalendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)){
+			mDisp = DayDisplay.TOMORROW;
+		}
 	}
-	public Day(Calendar cal,DayDisplay disp){
+	public Day(Calendar cal){
 		this.mCalendar = cal;
-		this.mDisp = disp;
+		Calendar today = Calendar.getInstance();
+		today.setTime(new Date());
+		if(mCalendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) &&
+				mCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+				mCalendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)) {
+			mDisp = DayDisplay.TODAY;
+		}else if(mCalendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) + 1 &&
+				mCalendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+				mCalendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)){
+			mDisp = DayDisplay.TOMORROW;
+		}
 	}
 
 	/*@{

@@ -25,18 +25,17 @@ public class NotifyActivity extends Activity implements OnClickListener{
 		}
 		String strDesc = intent.getExtras().getString(BusecretaryActivity.DESC);
 		String strUri = intent.getExtras().getString(BusecretaryActivity.RING);
-		if(strUri == null){
-			finish();
+		if(strUri != null){
+			mPlayer = MediaPlayer.create(this, Uri.parse(strUri));
+
+			try {
+				mPlayer.prepare();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			mPlayer.setLooping(true);
+			mPlayer.start();
 		}
-		mPlayer = MediaPlayer.create(this, Uri.parse(strUri));
-		
-		try{
-			mPlayer.prepare();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		mPlayer.setLooping(true);
-		mPlayer.start();
 		
 		/*
 		 * initialize the ui
@@ -53,11 +52,15 @@ public class NotifyActivity extends Activity implements OnClickListener{
 		int nID = v.getId();
 		switch(nID){
 		case R.id.btn_confirm:
-			mPlayer.stop();
+			if (mPlayer != null) {
+				mPlayer.stop();
+			}
 			finish();
 			break;
 		case R.id.btn_delay:
-			mPlayer.stop();
+			if (mPlayer != null) {
+				mPlayer.stop();
+			}
 			finish();
 			break;
 		}

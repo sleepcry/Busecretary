@@ -7,14 +7,16 @@ public enum RepeatCategory {
 	NONE(1,"none"),EVERYDAY(2,"every day"),EVERYMONTH(3,"every month"),EVERYYEAR(4,"every year"),
 	EVERYHOUR(5,"every hour"),LAST(6,"perid of time");
 	private String mDesc;	//description of this category
+	private int mId; //the id
 	private RepeatCategory(int i,String str){
 		this.mDesc = str;
+		mId = i;
 	}
 	public String getDesc() {
 		return mDesc;
 	}
-	public void setDesc(String desc) {
-		this.mDesc = desc;
+	public int getId(){
+		return mId;
 	}
 	public static RepeatCategory getInstance(int i){
 		switch(i){
