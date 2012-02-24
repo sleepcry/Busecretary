@@ -34,15 +34,17 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		String sqlCreateTbl = "create table if not exists " + TBL_NAME + "(" + 
 		ID + " integer primary key DESC," + 
 		BusecretaryActivity.DAY + " integer not null," + 
-		BusecretaryActivity.DESC + " text not null," + 
-		BusecretaryActivity.RING + " text not null," + 
+		BusecretaryActivity.DESC + " text," + 
+		BusecretaryActivity.RING + " text," + 
 		BusecretaryActivity.CATEGORY + " integer not null" + 
 		")";
 		db.execSQL(sqlCreateTbl);
-		//db.delete(TBL_NAME, null, null);
 		
 	}
-
+	public void onOpen(SQLiteDatabase db){
+		super.onOpen(db);
+		//db.delete(TBL_NAME, null, null);
+	}
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		if (oldVersion != newVersion) {
@@ -55,12 +57,9 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 	 * user functions
 	 */
 	public void insert(int id,long time, String desc, String ring, int category){
-		//input check
-		if(ring == null || desc == null){
-			return;
-		}
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues cv = new ContentValues();
+		cv.put(ID, id);
 		cv.put(BusecretaryActivity.DAY, time);
 		if (desc != null) {
 			cv.put(BusecretaryActivity.DESC, desc);
@@ -69,7 +68,8 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		cv.put(BusecretaryActivity.CATEGORY, category);
 		//check if records with this id exist
 		Cursor c = db.query(TBL_NAME, new String[]{ID}, ID + "=" + id, null, null, null, null);
-		if(c != null && c.getCount() > 0){
+		
+		if(c != null && c.getCount() != 0){
 			//if find the same record,update the record
 			db.update(TBL_NAME, cv, ID + "=" + id, null);
 		}else{
@@ -80,13 +80,12 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 	private void clear(long time){
 		//delete the records whose time flag is earlier than the given time
 		SQLiteDatabase db = getWritableDatabase();
-		db.delete(TBL_NAME, BusecretaryActivity.DAY + "<" + time , null);
+		db.delete(TBL_NAME, BusecretaryActivity.DAY + "<" + time + " AND " + 
+				BusecretaryActivity.CATEGORY + " = " + RepeatCategory.NONE.getId(), null);
 	}
 	public List<BusecretaryActivity.NotificationData> query(long time){
-		//clear(time);
+		clear(time);
 		SQLiteDatabase db = this.getReadableDatabase();
-//		Cursor c = db.query(TBL_NAME, null, BusecretaryActivity.DAY + ">=" + time, null,
-//				null, null, BusecretaryActivity.DAY + " ASC");
 		Cursor c = db.query(TBL_NAME, null, null, null,
 				null, null, null);
 		if(c == null || c.getCount() == 0){
@@ -95,6 +94,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		c.moveToFirst();
 		List<BusecretaryActivity.NotificationData> lstRet = 
 			new ArrayList<BusecretaryActivity.NotificationData>();
+		int loc = 0;
 		do{
 			BusecretaryActivity.NotificationData n = new BusecretaryActivity.NotificationData();
 			Calendar cal = Calendar.getInstance();
@@ -106,6 +106,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 					c.getInt(c.getColumnIndex(BusecretaryActivity.CATEGORY)));
 			//update the mId according to the records from the database
 			n.mId = c.getInt(c.getColumnIndex(ID));
+			n.location = loc ++;
 			lstRet.add(n);
 		}while(c.moveToNext());
 		return lstRet;

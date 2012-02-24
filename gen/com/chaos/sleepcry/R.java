@@ -24,11 +24,14 @@ public final class R {
         public static final int btn_ring_desc=0x7f050003;
         public static final int btn_time_desc=0x7f050001;
         public static final int et_desc=0x7f050002;
+        public static final int pb_progress=0x7f05000b;
         public static final int tv_notify_msg=0x7f050007;
+        public static final int tv_title=0x7f05000a;
     }
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int notify=0x7f030001;
+        public static final int title=0x7f030002;
     }
     public static final class string {
         public static final int app_name=0x7f040001;

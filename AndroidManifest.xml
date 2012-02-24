@@ -11,8 +11,11 @@
         android:label="@string/app_name" >
         <activity
             android:label="@string/app_name"
-            android:name=".BusecretaryActivity" 
-            android:process=":remote">
+            android:name=".BusecretaryActivity"
+            android:launchMode="singleTask" 
+            android:clearTaskOnLaunch="true"
+            android:alwaysRetainTaskState="false"
+            >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,11 +23,19 @@
             </intent-filter>
         </activity>
         <activity 
-            android:name = ".NotifyActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+            android:finishOnTaskLaunch="true"
+            android:multiprocess="false"
+            android:name = ".NotifyActivity"
+            android:allowTaskReparenting="false"
+            android:alwaysRetainTaskState="false"
+            android:noHistory="false"
+            android:process=":remote" >
         </activity>
+
+        <receiver android:name=".NotifyReceiver" 
+            android:process=":remote">
+        </receiver>
+
     </application>
 
 </manifest>

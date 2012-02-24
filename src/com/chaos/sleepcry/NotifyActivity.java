@@ -3,6 +3,7 @@ package com.chaos.sleepcry;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class NotifyActivity extends Activity implements OnClickListener{
+public class NotifyActivity extends Activity implements OnClickListener, OnCompletionListener{
 	private MediaPlayer mPlayer = null;	//player to play the notification rings
 	private TextView mTvDesc = null;
 	private Button mBtnConfirm = null;
@@ -27,13 +28,12 @@ public class NotifyActivity extends Activity implements OnClickListener{
 		String strUri = intent.getExtras().getString(BusecretaryActivity.RING);
 		if(strUri != null){
 			mPlayer = MediaPlayer.create(this, Uri.parse(strUri));
-
+			mPlayer.setOnCompletionListener(this);
 			try {
 				mPlayer.prepare();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			mPlayer.setLooping(true);
 			mPlayer.start();
 		}
 		
@@ -65,5 +65,10 @@ public class NotifyActivity extends Activity implements OnClickListener{
 			break;
 		}
 		
+	}
+	@Override
+	public void onCompletion(MediaPlayer arg0) {
+		mPlayer.stop();
+		this.finish();		
 	}
 }
