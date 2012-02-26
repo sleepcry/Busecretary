@@ -1,20 +1,55 @@
 package com.chaos.sleepcry;
 
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 
 public class NotifyReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context c, Intent intent) {
-		//Intent intent2 = new Intent(c, NotifyService.class);
-		Intent intent2 = new Intent(c, NotifyActivity.class);
-		intent2.putExtras(intent.getExtras());
-		//ComponentName name = c.startService(intent2);
-		intent2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		c.startActivity(intent2);
+		Bundle bundle = intent.getExtras();
+		if(null == bundle){
+			return;
+		}
+		String action = intent.getAction();
+		Log.d("widget",action);
+		Log.d("widget","receiver context " + c.toString());
+		if(action != null && (action.equals(BSRemoteView.ACTION_NEXT) ||
+				action.equals(BSRemoteView.ACTION_PREVIOUS))){
+			int id = bundle.getInt(BusecretaryActivity.NOTI_ID,-1);
+			if (id != -1) {
+				NotifyDatabase db = new NotifyDatabase(c,
+						BusecretaryActivity.DB_VER);
+				BusecretaryActivity.NotificationData data = db.queryone(id);
+				if (null == data) {
+					return;
+				}
+				db.setCurRcd(id);
+				Log.d("widget","set id into:" + id);
+				BSRemoteView view = new BSRemoteView(c, id);
+				view.setTextViewText(R.id.tv_widget_content,data.desc);
+				AppWidgetManager appWidgetManager = AppWidgetManager
+						.getInstance(c);
+				int[] ids = appWidgetManager.getAppWidgetIds(new ComponentName(
+						c, BsWidget.class));
+				for (int i = 0; i < ids.length; i++) {
+					int appWidgetId = ids[i];
+					appWidgetManager.updateAppWidget(appWidgetId, view);
+					Log.d("widget","update remote view " + ids[i]);
+				}
+			}
+		}else{
+			Intent intent2 = new Intent(c, NotifyActivity.class);
+			intent2.putExtras(intent.getExtras());
+			intent2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			c.startActivity(intent2);
+		}
 	}
 
 }

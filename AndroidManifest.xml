@@ -12,9 +12,6 @@
         <activity
             android:label="@string/app_name"
             android:name=".BusecretaryActivity"
-            android:launchMode="singleTask" 
-            android:clearTaskOnLaunch="true"
-            android:alwaysRetainTaskState="false"
             >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -32,8 +29,13 @@
             android:process=":remote" >
         </activity>
 
-        <receiver android:name=".NotifyReceiver" 
-            android:process=":remote">
+        <receiver android:name=".NotifyReceiver" >
+            <intent-filter >
+                <action android:name="com.chaos.sleepcry.NEXT"/>
+            </intent-filter>
+            <intent-filter >
+                <action android:name="com.chaos.sleepcry.PREVIOUS"/>
+            </intent-filter>
         </receiver>
         <receiver android:name=".BsWidget" 
             android:icon="@drawable/todo4">

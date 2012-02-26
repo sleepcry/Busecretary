@@ -93,6 +93,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	public static final String RING = "ring";
 	public static final String CATEGORY = "category";
 	public static final String DAY = "day";
+	public static final int DB_VER = 3;
+	public static final String NOTI_ID = "noti_id";
 
 	/*
 	 * @}
@@ -122,7 +124,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		/*
 		 * @}
 		 */
-		WindowManager wm = this.getWindowManager();
 		this.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 				R.layout.title);
 		/*
@@ -131,7 +132,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		mPbPregress = (ProgressBar) this.findViewById(R.id.pb_progress);
 		mPbPregress.setBackgroundColor(0x007fff7f);
 		mTitleDesc = (TextView) this.findViewById(R.id.tv_title);
-		mDB = new NotifyDatabase(this, 2);
+		mDB = new NotifyDatabase(this, DB_VER);
 		mLstNotis = mDB.query(System.currentTimeMillis());
 		/*
 		 * if the list has not been built if gotten nothing from the
@@ -148,10 +149,24 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		}
 		// if found something,at least one record
 		else {
-			// mCurNoti = mLstNotis.get(0);
-			switchNotif(mLstNotis.get(0));
+			/*
+			 * TODO: here we ignore a scenario that at the right time we start this activity,some
+			 * notification run expired
+			 */
+			Intent intent = getIntent();
+			NotificationData data = mLstNotis.get(0); 
+			if(intent != null && intent.getExtras()!= null && intent.getExtras().getInt(NOTI_ID,-1) != -1){
+				int id = intent.getExtras().getInt(NOTI_ID);
+				for (int i = 0; i < mLstNotis.size(); i++) {
+					NotificationData data1 = mLstNotis.get(i);
+					if (data1.mId == id) {
+						data = data1;
+						break;
+					}
+				}
+			}
+			switchNotif(data);
 		}
-		Application app = this.getApplication();
 	}
 
 	@Override
@@ -344,12 +359,12 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			mLstNotis.add(mCurNoti.location, mCurNoti);
 		}
 		// process the to-go one
-		if (mLstNotis.indexOf(data) != -1) {
+		if (mLstNotis.indexOf(data) != -1 && data != null) {
 			Intent intent = new Intent(BusecretaryActivity.this,
 					NotifyActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putString(DESC, mCurNoti.desc);
-			bundle.putString(RING, mCurNoti.ring);
+			bundle.putString(DESC, data.desc);
+			bundle.putString(RING, data.ring);
 			intent.putExtras(bundle);
 			PendingIntent pIntent = PendingIntent.getActivity(
 					BusecretaryActivity.this, 0, intent, 0);
