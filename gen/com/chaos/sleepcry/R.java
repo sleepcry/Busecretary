@@ -11,35 +11,50 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int cartoon_grassplain=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
+        public static final int arrow_button_left=0x7f020000;
+        public static final int arrow_button_right=0x7f020001;
+        public static final int arrow_left=0x7f020002;
+        public static final int arrow_left_b=0x7f020003;
+        public static final int arrow_left_s=0x7f020004;
+        public static final int arrow_right=0x7f020005;
+        public static final int arrow_right_b=0x7f020006;
+        public static final int arrow_right_s=0x7f020007;
+        public static final int cartoon_grassplain=0x7f020008;
+        public static final int ic_launcher=0x7f020009;
     }
     public static final class id {
-        public static final int btn_confirm=0x7f050008;
-        public static final int btn_date_desc=0x7f050000;
-        public static final int btn_delay=0x7f050009;
-        public static final int btn_next=0x7f050006;
-        public static final int btn_previous=0x7f050005;
-        public static final int btn_repeat_desc=0x7f050004;
-        public static final int btn_ring_desc=0x7f050003;
-        public static final int btn_time_desc=0x7f050001;
-        public static final int et_desc=0x7f050002;
-        public static final int pb_progress=0x7f05000b;
-        public static final int tv_notify_msg=0x7f050007;
-        public static final int tv_title=0x7f05000a;
+        public static final int btn_confirm=0x7f060008;
+        public static final int btn_date_desc=0x7f060000;
+        public static final int btn_delay=0x7f060009;
+        public static final int btn_next=0x7f060006;
+        public static final int btn_previous=0x7f060005;
+        public static final int btn_repeat_desc=0x7f060004;
+        public static final int btn_ring_desc=0x7f060003;
+        public static final int btn_time_desc=0x7f060001;
+        public static final int btn_widget_next=0x7f06000e;
+        public static final int btn_widget_previous=0x7f06000c;
+        public static final int et_desc=0x7f060002;
+        public static final int pb_progress=0x7f06000b;
+        public static final int tv_notify_msg=0x7f060007;
+        public static final int tv_title=0x7f06000a;
+        public static final int tv_widget_content=0x7f06000d;
     }
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int notify=0x7f030001;
         public static final int title=0x7f030002;
+        public static final int widget_bs=0x7f030003;
     }
     public static final class string {
-        public static final int app_name=0x7f040001;
-        public static final int hello=0x7f040000;
-        public static final int str_categ=0x7f040006;
-        public static final int str_date=0x7f040002;
-        public static final int str_desc=0x7f040004;
-        public static final int str_ring=0x7f040005;
-        public static final int str_time=0x7f040003;
+        public static final int app_name=0x7f050001;
+        public static final int hello=0x7f050000;
+        public static final int str_categ=0x7f050006;
+        public static final int str_date=0x7f050002;
+        public static final int str_desc=0x7f050004;
+        public static final int str_ring=0x7f050005;
+        public static final int str_time=0x7f050003;
+    }
+    public static final class xml {
+        public static final int buse=0x7f040000;
     }
 }
