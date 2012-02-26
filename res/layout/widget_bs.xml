@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dip"
+    android:orientation="horizontal" 
+    android:background="@drawable/cartoon_grassplain">
+
+    <Button
+        android:id="@+id/btn_widget_previous"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
+        android:layout_gravity="center"
+        android:background="@drawable/arrow_button_left" />
+
+    <TextView
+        android:id="@+id/tv_widget_content"
+        android:layout_width="200dip"
+        android:layout_height="60dip"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:text="notification message" />
+
+    <Button
+        android:id="@+id/btn_widget_next"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
+        android:layout_gravity="center"
+        android:background="@drawable/arrow_button_right"/>
+
+</LinearLayout>
