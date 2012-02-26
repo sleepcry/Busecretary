@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="60dip"
     android:orientation="horizontal" 
-    android:background="@drawable/cartoon_grassplain">
+    android:background="@drawable/cartoon_grassplain"
+    >
 
     <Button
         android:id="@+id/btn_widget_previous"
