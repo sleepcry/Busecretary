@@ -101,7 +101,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		this.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
 				R.layout.title);
 		mPbPregress = (ProgressBar) this.findViewById(R.id.pb_progress);
-		mPbPregress.setBackgroundColor(0x007fff7f);
 		mTitleDesc = (TextView) this.findViewById(R.id.tv_title);
 		mDB = new NotifyDatabase(this, DB_VER);
 		mLstNotis = mDB.query(System.currentTimeMillis());
@@ -133,7 +132,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			@Override
 			public boolean onTouch(View v, MotionEvent motion) {
 				int action = motion.getAction();
-				int index = motion.getActionIndex();
 				switch(action){
 				case MotionEvent.ACTION_DOWN:
 					mPosDown.set((int)motion.getX(),(int)motion.getY());
@@ -166,6 +164,9 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 					}
 					// roll back
 					commitTranslate(mode);
+					if(mPosDown.x - mPosCur.x >= 10){
+						motion.setAction(MotionEvent.ACTION_CANCEL);
+					}
 					mTotalOffset = 0;
 					break;
 				case MotionEvent.ACTION_MOVE:
@@ -184,12 +185,14 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 					mTotalOffset = 0;
 					break;
 				}
+				mCur.dispatchTouchEvent(motion);
 				return true;
 			}
 			
 		});
 		this.addContentView(v, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT));
+		
 	}
 
 	@Override
@@ -275,15 +278,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		
 		// process the current notification
 		if (mCurNoti != null && mLstNotis.indexOf(mCurNoti) == -1) {
-			if (mCurNoti.getRing() == null) {
-				Toast.makeText(this, "the notification ring is empty!",
-						Toast.LENGTH_SHORT).show();
-			}
 			mCurNoti.setDesc(mCur.getDesc());
-			if (mCurNoti.getDesc() == null || mCurNoti.getDesc().equals("")) {
-				Toast.makeText(this, "the description is empty!",
-						Toast.LENGTH_SHORT).show();
-			}
 			if (mCurNoti.getDay().getCalendar().getTimeInMillis() <= System
 					.currentTimeMillis()) {
 				Toast.makeText(this, "the time is in the past!",

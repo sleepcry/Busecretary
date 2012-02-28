@@ -1,15 +1,10 @@
 package com.chaos.sleepcry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,22 +17,17 @@ public class MainView extends LinearLayout {
 	private Button mBtnTimeDesc = null; // describe the time on the day
 	private Button mBtnRingDesc = null; // describe the notification ring
 	private Button mBtnRepeatDesc = null; // describe the repeat pattern
-	private Button mBtnPrevious = null;
-	private Button mBtnNext = null;
 	private EditText mEtDesc = null; // describe the notification content
-	private ViewGroup mContainer = null;
 	/*
 	 * @}
 	 */
 	private PaneAnimation mAnimation = null;
-	
-	private List<View> mComponent = null;
 	private BusecretaryActivity mMainFrm = null;
+
 	public MainView(BusecretaryActivity context) {
 		super(context);
 		mMainFrm = context;
 		LayoutInflater.from(context).inflate(R.layout.mainview, this, true);
-		mComponent = new ArrayList<View>();
 		/*
 		 * @{ initialize all view components
 		 */
@@ -53,32 +43,34 @@ public class MainView extends LinearLayout {
 		/*
 		 * @}
 		 */
-		mComponent.add(findViewById(R.id.container1));
-		mComponent.add(findViewById(R.id.container2));
-		mComponent.add(findViewById(R.id.container3));
-		mComponent.add(findViewById(R.id.container4));
-		mComponent.add(findViewById(R.id.container6));
 		mAnimation = new PaneAnimation(0);
 	}
-	public void translate(int x){
+
+	public void translate(int x) {
 		mAnimation.addX(x);
-//		for(int i=0;i<mComponent.size();i++){
-//			mComponent.get(i).startAnimation(mAnimation);
-//		}
+		// for(int i=0;i<mComponent.size();i++){
+		// mComponent.get(i).startAnimation(mAnimation);
+		// }
 		startAnimation(mAnimation);
 	}
-	public void translate(int x,long duration){
+
+	public void translate(int x, long duration) {
 		mAnimation.addX(x);
-		PaneAnimation anim = new PaneAnimation(mAnimation.getX(),0,0,duration);
+		PaneAnimation anim = new PaneAnimation(mAnimation.getX(), 0, 0,
+				duration);
+		anim.setInterpolator(new BounceInterpolator());
+		anim.setDuration(duration);
 		startAnimation(anim);
 	}
-	
-	public String getDesc(){
+
+	public String getDesc() {
 		return mEtDesc.getText().toString();
 	}
-	public void setDesc(String desc){
+
+	public void setDesc(String desc) {
 		mEtDesc.setText(desc);
 	}
+
 	public void notifyUI(NotificationData data) {
 		if (data == null) {
 			return;
@@ -92,13 +84,12 @@ public class MainView extends LinearLayout {
 					null);
 			cursor.moveToFirst();
 			if (!cursor.isNull(0)) {
-				mBtnRingDesc.setText(cursor.getString(0));
+				mBtnRingDesc.setText("Notify Ring:" + cursor.getString(0));
 			}
 		} else {
 			mBtnRingDesc.setText("choose a ring here...");
 		}
-		mBtnRepeatDesc.setText(data.getCategory().getDesc());
+		mBtnRepeatDesc.setText("Category:  " + data.getCategory().getDesc());
 	}
 
-	
 }

@@ -2,8 +2,6 @@ package com.chaos.sleepcry;
 
 import android.graphics.Camera;
 import android.graphics.Matrix;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
@@ -19,9 +17,6 @@ public class PaneAnimation extends Animation{
 		dz = z;
 		this.setDuration(duration);
 		this.setFillAfter(true);
-		if(duration > 0){
-			this.setInterpolator(new AccelerateDecelerateInterpolator());
-		}
 		mCamera = new Camera();
 	}
 	public PaneAnimation(int x){

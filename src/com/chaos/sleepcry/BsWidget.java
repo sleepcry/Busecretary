@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
 
 public class BsWidget extends AppWidgetProvider {
 	@Override

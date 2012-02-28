@@ -41,12 +41,12 @@ public class Day {
 	 */
 	public String getDateString(){
 		int month = mCalendar.get(Calendar.MONTH) + 1;
-		return mCalendar.get(Calendar.YEAR) + "-" + 
+		return "Date:  " + mCalendar.get(Calendar.YEAR) + "-" + 
 				month + "-" + 
 				mCalendar.get(Calendar.DAY_OF_MONTH);
 	}
 	public String getTimeString(){
-		return mCalendar.get(Calendar.HOUR_OF_DAY) + 
+		return "Time:  " + mCalendar.get(Calendar.HOUR_OF_DAY) + 
 				":" + mCalendar.get(Calendar.MINUTE) + ":" + 
 				mCalendar.get(Calendar.SECOND);
 	}
