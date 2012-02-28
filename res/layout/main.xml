@@ -1,153 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:background="@drawable/cartoon_grassplain"
-    >
-
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal" 
-     >
-
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/str_date"
-	        android:textColor="#000" 
-	        />
-
-	    <Button
-	        android:id="@+id/btn_date_desc"
-	        android:layout_width="0dp"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-	        android:text="today"
-	        android:textSize="20dp" 
-	        />
-	</LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-    
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/str_time"
-            android:textColor="#000" />
-
-        <Button
-            android:id="@+id/btn_time_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-	        android:layout_weight="1"
-            android:text="17:24:30"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#CCC" />
-    
-	<TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_desc"
-        android:textColor="#000"
-        />
-    <EditText
-        android:id="@+id/et_desc"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-    	android:textSize="20dp"
-        android:text="" 
-        android:gravity="left"
-        android:selectAllOnFocus="true"
-         />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/str_ring"
-            android:textColor="#000" />
-
-        <Button
-            android:id="@+id/btn_ring_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="choose a ring here..."
-	        android:layout_weight="1"
-            android:textSize="15dp" />
-    </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#CCC" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/str_categ"
-            android:textColor="#000" />
-
-        <Button
-            android:id="@+id/btn_repeat_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-	        android:layout_weight="1"
-            android:text="none"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal"
-	    android:layout_gravity="bottom"
-        android:layout_weight="1"
-	    >
-		<Button 
-			android:id="@+id/btn_previous"
-        	android:layout_weight="0.3"
-        	android:layout_width="0dp"
-        	android:layout_height="wrap_content"
-    		android:textSize="20dp"
-        	android:text="previous" 
-        	android:layout_gravity="bottom"
-        />    
-        <Button 
-			android:id="@+id/btn_next"
-        	android:layout_weight="0.3"
-        	android:layout_width="0dp"
-        	android:layout_height="wrap_content"
-    		android:textSize="20dp"
-        	android:text="next" 
-        	android:layout_gravity="bottom"
-        />   
-	</LinearLayout>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:background="@drawable/cartoon_grassplain"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+	<com.chaos.sleepcry.MainView
+		android:id="@+id/mainview1"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+	<com.chaos.sleepcry.MainView
+		android:id="@+id/mainview2"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+	<com.chaos.sleepcry.MainView
+		android:id="@+id/mainview3"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 </LinearLayout>

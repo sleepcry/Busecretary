@@ -16,9 +16,9 @@ public class BsWidget extends AppWidgetProvider {
 			BSRemoteView rvs = new BSRemoteView(context,0);
 			Log.d("widget","update context " + context.toString());			
 			NotifyDatabase db = new NotifyDatabase(context,BusecretaryActivity.DB_VER);
-			BusecretaryActivity.NotificationData data = db.queryone(0);
+			NotificationData data = db.queryone(0);
 			if(null != data){
-				rvs.setTextViewText(R.id.tv_widget_content, data.desc);
+				rvs.setTextViewText(R.id.tv_widget_content, data.getDesc());
 			}else{
 				rvs.setTextViewText(R.id.tv_widget_content, "add something here...");
 			}

@@ -89,7 +89,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 				BusecretaryActivity.CATEGORY + " = " + RepeatCategory.NONE.getId(), null);
 		db.close();
 	}
-	public List<BusecretaryActivity.NotificationData> query(long time){
+	public List<NotificationData> query(long time){
 		clear(time);
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.query(TBL_NAME, null, null, null,
@@ -99,27 +99,27 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			return null;
 		}
 		c.moveToFirst();
-		List<BusecretaryActivity.NotificationData> lstRet = 
-			new ArrayList<BusecretaryActivity.NotificationData>();
+		List<NotificationData> lstRet = 
+			new ArrayList<NotificationData>();
 		int loc = 0;
 		do{
-			BusecretaryActivity.NotificationData n = new BusecretaryActivity.NotificationData();
+			NotificationData n = new NotificationData();
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(c.getLong(c.getColumnIndex(BusecretaryActivity.DAY)));
-			n.day = new Day(cal);
-			n.desc = c.getString(c.getColumnIndex(BusecretaryActivity.DESC));
-			n.ring = c.getString(c.getColumnIndex(BusecretaryActivity.RING));
-			n.category = RepeatCategory.getInstance(
-					c.getInt(c.getColumnIndex(BusecretaryActivity.CATEGORY)));
-			//update the mId according to the records from the database
-			n.mId = c.getInt(c.getColumnIndex(ID));
-			n.location = loc ++;
+			n.setDay(new Day(cal));
+			n.setDesc(c.getString(c.getColumnIndex(BusecretaryActivity.DESC)));
+			n.setRing(c.getString(c.getColumnIndex(BusecretaryActivity.RING)));
+			n.setCategory(RepeatCategory.getInstance(c.getInt(c
+					.getColumnIndex(BusecretaryActivity.CATEGORY))));
+			// update the mId according to the records from the database
+			n.setId(c.getInt(c.getColumnIndex(ID)));
+			n.setLocation(loc ++);
 			lstRet.add(n);
 		}while(c.moveToNext());
 		db.close();
 		return lstRet;
 	}
-	public BusecretaryActivity.NotificationData queryone(int id){
+	public NotificationData queryone(int id){
 		clear(System.currentTimeMillis());
 		String query_condition = ID + "=" + id;
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -130,16 +130,16 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			return null;
 		}
 		c.moveToFirst();
-		BusecretaryActivity.NotificationData n = new BusecretaryActivity.NotificationData();
+		NotificationData n = new NotificationData();
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(c.getLong(c.getColumnIndex(BusecretaryActivity.DAY)));
-		n.day = new Day(cal);
-		n.desc = c.getString(c.getColumnIndex(BusecretaryActivity.DESC));
-		n.ring = c.getString(c.getColumnIndex(BusecretaryActivity.RING));
-		n.category = RepeatCategory.getInstance(c.getInt(c
-				.getColumnIndex(BusecretaryActivity.CATEGORY)));
+		n.setDay(new Day(cal));
+		n.setDesc(c.getString(c.getColumnIndex(BusecretaryActivity.DESC)));
+		n.setRing(c.getString(c.getColumnIndex(BusecretaryActivity.RING)));
+		n.setCategory(RepeatCategory.getInstance(c.getInt(c
+				.getColumnIndex(BusecretaryActivity.CATEGORY))));
 		// update the mId according to the records from the database
-		n.mId = c.getInt(c.getColumnIndex(ID));
+		n.setId(c.getInt(c.getColumnIndex(ID)));
 		db.close();
 		return n;
 	}

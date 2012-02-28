@@ -17,7 +17,9 @@ public class NotifyReceiver extends BroadcastReceiver {
 			return;
 		}
 		String action = intent.getAction();
-		Log.d("widget",action);
+		if(action != null){
+			Log.d("widget",action);
+		}
 		Log.d("widget","receiver context " + c.toString());
 		if(action != null && (action.equals(BSRemoteView.ACTION_NEXT) ||
 				action.equals(BSRemoteView.ACTION_PREVIOUS))){
@@ -25,14 +27,14 @@ public class NotifyReceiver extends BroadcastReceiver {
 			if (id != -1) {
 				NotifyDatabase db = new NotifyDatabase(c,
 						BusecretaryActivity.DB_VER);
-				BusecretaryActivity.NotificationData data = db.queryone(id);
+				NotificationData data = db.queryone(id);
 				if (null == data) {
 					return;
 				}
 				db.setCurRcd(id);
 				Log.d("widget","set id into:" + id);
 				BSRemoteView view = new BSRemoteView(c, id);
-				view.setTextViewText(R.id.tv_widget_content,data.desc);
+				view.setTextViewText(R.id.tv_widget_content,data.getDesc());
 				AppWidgetManager appWidgetManager = AppWidgetManager
 						.getInstance(c);
 				int[] ids = appWidgetManager.getAppWidgetIds(new ComponentName(
