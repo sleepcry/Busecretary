@@ -3,6 +3,7 @@ package com.chaos.sleepcry;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.animation.BounceInterpolator;
 import android.widget.Button;
@@ -84,7 +85,8 @@ public class MainView extends LinearLayout {
 					null);
 			cursor.moveToFirst();
 			if (!cursor.isNull(0)) {
-				mBtnRingDesc.setText("Notify Ring:" + cursor.getString(0));
+				mBtnRingDesc.setText("NotifyRing:" + cursor.getString(0));
+				Log.d("ui",mBtnRingDesc.getText().toString());
 			}
 		} else {
 			mBtnRingDesc.setText("choose a ring here...");

@@ -8,7 +8,7 @@
     <Button
         android:id="@+id/btn_date_desc"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
+        android:layout_height="wrap_content"
         android:background="@drawable/normal_btn"
         android:text="today"
         android:textColor="#FFF"
@@ -22,7 +22,7 @@
     <Button
         android:id="@+id/btn_time_desc"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
+        android:layout_height="wrap_content"
         android:background="@drawable/normal_btn"
         android:text="17:24:30"
         android:textColor="#FFF"
@@ -50,11 +50,12 @@
     <Button
         android:id="@+id/btn_ring_desc"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
+        android:layout_height="wrap_content"
         android:background="@drawable/normal_btn"
         android:text="choose a ring here..."
         android:textColor="#F7F"
-        android:textSize="20dp" />
+        android:textSize="12dp" 
+        android:gravity="left"/>
 
     <View
         android:layout_width="match_parent"
@@ -64,7 +65,7 @@
     <Button
         android:id="@+id/btn_repeat_desc"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
+        android:layout_height="wrap_content"
         android:background="@drawable/normal_btn"
         android:text="none"
         android:textColor="#FFF"
