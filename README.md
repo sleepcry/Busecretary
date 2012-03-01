@@ -1,26 +1,26 @@
 ##Philosophy
 Time leads to space,space leads to substance,substance leads to soul.   
-I don``t have that time to remember what I planed to do next. I need   
+I don't have that time to remember what I planed to do next. I need   
 a notification,clearly and simply.   
 
 ## What
-I``m trying to manage my TODO business simply and clearly.So I need a    
-secretary,a smart business secretary, that``s why I call it Busecretary.
+I'm trying to manage my TODO business simply and clearly.So I need a    
+secretary,a smart business secretary, that's why I call it Busecretary.
 
 ##Why
-Insofar as we know,there are already so many calendar apps,why don``t   
+Insofar as we know,there are already so many calendar apps,why don't   
 I use them.Simply saying,they are too comlex or too pool.   
 I always forget something, and I want to be notified when it is time   
 to do something. However, the existent apps cannot satisfy my    
 requirement fully. Alarm can simply notify me every day, and only a   
 few alarms can be set. The calendar is complex to use and cannot set   
 the event freely. So I want to combine the alarm and the calendar   
-together. Collect both one``s advantage and discard their disadvantage.   
-That``s why the Busecretary  is conceived.   
+together. Collect both one's advantage and discard their disadvantage.   
+That's why the Busecretary  is conceived.   
 
 ##How
 I need to be notified clearly and customizedly. So far as I can    
-imagine,I``d like to set a notification as followings:    
+imagine,I'd like to set a notification as followings:    
 
 * select a time (day, hour, minute, second, etc.), choose a notify   
 ring, describe the alarm, and you will be notified at that time.
