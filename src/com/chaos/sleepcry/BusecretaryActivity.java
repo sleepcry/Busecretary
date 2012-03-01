@@ -124,6 +124,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			}
 			switchNotif(data==null?mLstNotis.get(0):data);
 		}
+		notifyUI(null,mCurNoti,null);
 		mPosDown = new Point(-1,-1);
 		mPosCur = new Point(-1,-1);
 		mPosPre = new Point(-1,-1);
@@ -372,21 +373,21 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			mCur.setDesc(mCurNoti.getDesc());
 		}
 
-		// update the UI with new data
-		NotificationData pre = null;
-		NotificationData next = null;
-		if(data != null){
-			int location = data.getLocation();
-			if( location-1 >= 0){
-				pre = mLstNotis.get(location-1);
-			}
-			if(location + 1 < mLstNotis.size()-1 ){
-				next = mLstNotis.get(location + 1);
-			}else{
-				next = new NotificationData(data.getId() + 1, data.getLocation() + 1);
-			}
-		}
-		notifyUI(pre,mCurNoti,next);
+//		// update the UI with new data
+//		NotificationData pre = null;
+//		NotificationData next = null;
+//		if(data != null){
+//			int location = data.getLocation();
+//			if( location-1 >= 0){
+//				pre = mLstNotis.get(location-1);
+//			}
+//			if(location + 1 < mLstNotis.size()-1 ){
+//				next = mLstNotis.get(location + 1);
+//			}else{
+//				next = new NotificationData(data.getId() + 1, data.getLocation() + 1);
+//			}
+//		}
+//		notifyUI(pre,mCurNoti,next);
 
 	}
 
@@ -407,11 +408,17 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	private void notifyUI(NotificationData pre,NotificationData data,NotificationData next) {
-		if (data == null) {
-			return;
+	private void notifyUI(NotificationData pre,
+			NotificationData data,NotificationData next) {
+		if (pre == null) {
+			pre = new NotificationData();
 		}
-		
+		if (data == null) {
+			data = new NotificationData();
+		}
+		if (next == null) {
+			next = new NotificationData();
+		}
 		//include the current one
 		int total = mLstNotis.size() + 1;
 		//one-based index
@@ -487,6 +494,9 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			mCur = mNext;
 			mNext = mPrevious;
 			mPrevious = temp;
+			mNext.reset();
+			mCur.reset();
+			mCur.reset();
 			Log.d("animation","next " + commitOffset);
 			break;
 		case COMMIT_PREVIOUS:
@@ -496,6 +506,9 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			mCur = mPrevious;
 			mPrevious = mNext;
 			mNext = temp;
+			mNext.reset();
+			mCur.reset();
+			mCur.reset();
 			Log.d("animation","previous " + commitOffset);
 			break;
 		}
@@ -508,8 +521,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			if( location-1 >= 0){
 				pre = mLstNotis.get(location-1);
 			}
-			if(location + 1 < mLstNotis.size()-1 ){
-				next = mLstNotis.get(location + 1);
+			if(location < mLstNotis.size() ){
+				next = mLstNotis.get(location);
 			}else{
 				next = new NotificationData(mCurNoti.getId() + 1, mCurNoti.getLocation() + 1);
 			}

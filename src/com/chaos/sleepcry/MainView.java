@@ -71,7 +71,9 @@ public class MainView extends LinearLayout {
 	public void setDesc(String desc) {
 		mEtDesc.setText(desc);
 	}
-
+	public void reset(){
+		setDesc("");
+	}
 	public void notifyUI(NotificationData data) {
 		if (data == null) {
 			return;
@@ -91,6 +93,11 @@ public class MainView extends LinearLayout {
 		} else {
 			mBtnRingDesc.setText("choose a ring here...");
 		}
+		String text = getDesc();
+		if(text.equals("")){
+			text = data.getDesc();
+		}
+		setDesc(text);
 		mBtnRepeatDesc.setText("Category:  " + data.getCategory().getDesc());
 	}
 
