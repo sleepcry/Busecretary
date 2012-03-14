@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical" >
+
+    <com.chaos.sleepcry.busecretary.mydraw.PaintBoard
+        android:id="@+id/surfaceView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/ctrlpane"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/undo"
+            style="@style/underlyingbtn"
+            android:onClick="undo"
+            android:text="@string/menuundo" />
+
+        <Button
+            android:id="@+id/redo"
+            style="@style/underlyingbtn"
+            android:onClick="redo"
+            android:text="@string/menuredo" />
+
+        <Button
+            android:id="@+id/elements"
+            style="@style/underlyingbtn"
+            android:onClick="viewElements"
+            android:text="@string/elements" />
+    </LinearLayout>
+
+</LinearLayout>

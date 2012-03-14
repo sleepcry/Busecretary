@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.chaos.sleepcry"
+    package="com.chaos.sleepcry.busecretary"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -11,45 +11,62 @@
         android:label="@string/app_name" >
         <activity
             android:label="@string/app_name"
-            android:name=".BusecretaryActivity"
-            >
+            android:name="com.chaos.sleepcry.busecretary.BusecretaryActivity" >
+        </activity>
+        <activity
+            android:allowTaskReparenting="false"
+            android:alwaysRetainTaskState="false"
+            android:finishOnTaskLaunch="true"
+            android:multiprocess="false"
+            android:name="com.chaos.sleepcry.busecretary.notify.NotifyActivity"
+            android:noHistory="false"
+            android:process=":remote" >
+        </activity>
+        <activity
+            android:finishOnTaskLaunch="true"
+            android:icon="@drawable/todo4"
+            android:label="@string/app_name"
+            android:name="com.chaos.sleepcry.busecretary.loading.LoadingActivity"
+            android:noHistory="true" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity 
-            android:finishOnTaskLaunch="true"
-            android:multiprocess="false"
-            android:name = ".NotifyActivity"
-            android:allowTaskReparenting="false"
-            android:alwaysRetainTaskState="false"
-            android:noHistory="false"
-            android:process=":remote" >
+        <activity
+            android:icon="@drawable/todo4"
+            android:label="@string/app_name"
+            android:name="com.chaos.sleepcry.busecretary.append.AppendActivity" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity" >
         </activity>
 
-        <receiver android:name=".NotifyReceiver" >
+        <receiver android:name="com.chaos.sleepcry.busecretary.notify.NotifyReceiver" >
             <intent-filter >
-                <action android:name="com.chaos.sleepcry.NEXT"/>
+                <action android:name="com.chaos.sleepcry.NEXT" />
             </intent-filter>
             <intent-filter >
-                <action android:name="com.chaos.sleepcry.PREVIOUS"/>
+                <action android:name="com.chaos.sleepcry.PREVIOUS" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".BsWidget" 
-            android:icon="@drawable/todo4">
+        <receiver
+            android:icon="@drawable/todo4"
+            android:name="com.chaos.sleepcry.busecretary.widget.BsWidget" >
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/buse" 
-                >
+                android:resource="@xml/buse" >
             </meta-data>
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />                 
-            </intent-filter>
-                
-        </receiver>
 
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </receiver>
     </application>
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
 </manifest>
