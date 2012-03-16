@@ -14,4 +14,13 @@
         <item name="android:shadowRadius">10</item>
     </style>
 
+    <style name="colorcellstyle">
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_weight">0.1</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
 </resources>

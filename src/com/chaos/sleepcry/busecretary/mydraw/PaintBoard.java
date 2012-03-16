@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -33,10 +32,12 @@ public class PaintBoard extends View implements OnTouchListener {
 	MyPolyLine mCurPolyline = null;
 	// current color for new stuffs
 	int mCurColor;
+	int mLineWidth;
 	AbstractOperation mCurOp = null;
 	boolean bEditable;
 	List<PointF> mMoveTrack = null;
 	Context mContext = null;
+	public static final String BACKGROUND = "background";
 
 	public PaintBoard(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -59,6 +60,7 @@ public class PaintBoard extends View implements OnTouchListener {
 		this.setBackgroundColor(Color.WHITE);
 		mCurColor = Color.BLACK;
 		bEditable = true;
+		mLineWidth = 3;
 	}
 
 	public void setEditable(boolean canEdit) {
@@ -75,7 +77,10 @@ public class PaintBoard extends View implements OnTouchListener {
 		canvas.drawRect(new Rect(getLeft(), getTop(), getRight(), getBottom()),
 				paint);
 		for (int i = 0; i < mDrawList.size(); i++) {
-			mDrawList.get(i).draw(canvas);
+			Mydraw mydraw = mDrawList.get(i);
+			if (mydraw.isVisible()) {
+				mDrawList.get(i).draw(canvas);
+			}
 		}
 	}
 
@@ -90,7 +95,8 @@ public class PaintBoard extends View implements OnTouchListener {
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
 			mMoveTrack = new ArrayList<PointF>();
-			mMoveTrack.add(new PointF((e.getX()-rect.left)/rect.width(), (e.getY()-rect.top)/rect.height()));
+			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
+					.getY() - rect.top) / rect.height()));
 			return true;
 		case MotionEvent.ACTION_CANCEL:
 			mDrawList.remove(mCurPolyline);
@@ -100,28 +106,31 @@ public class PaintBoard extends View implements OnTouchListener {
 		case MotionEvent.ACTION_MOVE:
 			int historySize = e.getHistorySize();
 			for (int i = 0; i < historySize; i++) {
-				mMoveTrack.add(new PointF((e.getHistoricalX(i)-rect.left)/rect.width(), (e
-						.getHistoricalY(i)-rect.top)/rect.height()));
+				mMoveTrack.add(new PointF((e.getHistoricalX(i) - rect.left)
+						/ rect.width(), (e.getHistoricalY(i) - rect.top)
+						/ rect.height()));
 			}
-			mMoveTrack.add(new PointF((e.getX()-rect.left)/rect.width(), (e.getY()-rect.top)/rect.height()));
+			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
+					.getY() - rect.top) / rect.height()));
 			pts = new PointF[mMoveTrack.size()];
 			// remove the previous one
 			mDrawList.remove(mCurPolyline);
 			// add the updated one
 			mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts), mCurColor,
-					mDrawList.size());
+					mDrawList.size(), mLineWidth);
 			mCurPolyline.setView(this);
 			mDrawList.add(mCurPolyline);
 			invalidate();
 			return true;
 		case MotionEvent.ACTION_UP:
-			mMoveTrack.add(new PointF((e.getX()-rect.left)/rect.width(), (e.getY()-rect.top)/rect.height()));
+			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
+					.getY() - rect.top) / rect.height()));
 			pts = new PointF[mMoveTrack.size()];
 			// remove the previous one
 			mDrawList.remove(mCurPolyline);
 			// add the updated one
 			mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts), mCurColor,
-					mDrawList.size());
+					mDrawList.size(), mLineWidth);
 			add(mCurPolyline);
 			mMoveTrack = null;
 			mCurPolyline = null;
@@ -129,19 +138,27 @@ public class PaintBoard extends View implements OnTouchListener {
 		}
 		return false;
 	}
-
 	public void add(Mydraw draw) {
 		// abandon the tail
 		if (mCurOp != null) {
 			int opindex = mOperList.indexOf(mCurOp);
 			if (opindex != -1 && opindex != mOperList.size() - 1) {
 				mOperList = mOperList.subList(0, opindex + 1);
+				List<AbstractOperation> temp = mOperList;
+				mOperList = new ArrayList<AbstractOperation>();
+				for(int i=0;i<opindex;i++){
+					mOperList.add(temp.get(i));
+				}
 			}
 			Mydraw previousDraw = mCurOp.getDraw();
 			if (previousDraw != null) {
 				int hisindex = mHistory.indexOf(previousDraw);
 				if (hisindex != -1 && hisindex != mHistory.size() - 1) {
-					mHistory = mHistory.subList(0, hisindex + 1);
+					List<Mydraw> temp = mHistory;
+					mHistory = new ArrayList<Mydraw>();
+					for(int i=0;i<hisindex;i++){
+						mHistory.add(temp.get(i));
+					}
 				}
 			}
 		}
@@ -150,7 +167,7 @@ public class PaintBoard extends View implements OnTouchListener {
 		mCurOp = new AppendOperation(draw, mDrawList);
 		mOperList.add(mCurOp);
 		mCurOp.execute();
-		
+
 		invalidate();
 	}
 
@@ -213,27 +230,32 @@ public class PaintBoard extends View implements OnTouchListener {
 		Mydraw[] mydraws = new Mydraw[mDrawList.size()];
 		return mDrawList.toArray(mydraws);
 	}
-	public Bitmap toBitmap(){
+
+	public Bitmap toBitmap() {
 		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
-		Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(),
+				Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		onDraw(canvas);
 		return bitmap;
 	}
+
 	public Parcelable toParcel() {
 		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
-		Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(),
+				Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		onDraw(canvas);
 		MyDrawable.setContext(mContext);
 		FileOutputStream output = null;
 		try {
-			output = mContext.openFileOutput("rawimage.png", Context.MODE_WORLD_WRITEABLE);
+			output = mContext.openFileOutput("rawimage.png",
+					Context.MODE_WORLD_WRITEABLE);
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		
-		if( bitmap.compress(CompressFormat.PNG, 0, output)){
+
+		if (bitmap.compress(CompressFormat.PNG, 0, output)) {
 			try {
 				output.close();
 				output.flush();
@@ -241,7 +263,25 @@ public class PaintBoard extends View implements OnTouchListener {
 				e.printStackTrace();
 			}
 		}
-		MyDrawable mydraw = new MyDrawable("rawimage.png",new RectF(0,0,1,1),0);
+		MyDrawable mydraw = new MyDrawable("rawimage.png",
+				new RectF(0, 0, 1, 1), 0);
 		return mydraw;
+	}
+
+	public void setColor(int color) {
+		mCurColor = color;
+	}
+
+	public void setLineWidth(int progress) {
+		mLineWidth = progress;
+	}
+
+	public void changeVisibility(int position) {
+		if (position >= mDrawList.size() || position < 0) {
+			return;
+		}
+		Mydraw mydraw = mDrawList.get(position);
+		mydraw.setVisible(!mydraw.isVisible());
+		invalidate();
 	}
 }

@@ -8,6 +8,7 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 	// used to compare
 	int mLayer;
 	View mParent = null;
+	boolean bVisiable = true;
 	public Mydraw(int layer){
 		mLayer = layer;
 	}
@@ -30,5 +31,11 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 	}
 	public void setView(View parent){
 		mParent = parent;
+	}
+	public boolean isVisible(){
+		return bVisiable;
+	}
+	public void setVisible(boolean val){
+		bVisiable = val;
 	}
 }

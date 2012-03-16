@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000</color>
+        <color name="green1">#050</color>
+        <color name="green2">#0a0</color>
+        <color name="green3">#0f0</color>
+        <color name="blue">#00f</color>
+        <color name="cyan1">#05f</color>
+        <color name="cyan2">#0af</color>
+        <color name="cyan3">#0ff</color>
+        <color name="red">#f00</color>
+        <color name="yellow1">#f50</color>
+        <color name="yellow2">#fa0</color>
+        <color name="yellow3">#ff0</color>
+        <color name="pink1">#f0f</color>
+        <color name="pink2">#f5f</color>
+        <color name="pink3">#faf</color>
+        <color name="gray">#fff</color>
+    
+</resources>

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.chaos.sleepcry.busecretary.BusecretaryActivity;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity;
+import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
@@ -22,15 +23,14 @@ public class AppendActivity extends Activity {
 	PaintBoard mPb = null;
 	static final int VIEW_REQUEST = 0;
 	TextView mTitle = null;
-
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.append);
 		mPb = (PaintBoard) findViewById(R.id.canvas);
-		mTitle = (TextView)findViewById(R.id.title);
+		mTitle = (TextView) findViewById(R.id.title);
 		this.registerForContextMenu(mPb);
-		onUserInteraction();
 	}
 
 	public void ok(View v) {
@@ -86,7 +86,7 @@ public class AppendActivity extends Activity {
 			return true;
 		case R.id.menuedit:
 			Intent intent = new Intent(this, CanvasEditActivity.class);
-			intent.putExtra("background", mPb.toParcel());
+			intent.putExtra(PaintBoard.BACKGROUND, mPb.toParcel());
 			startActivityForResult(intent,VIEW_REQUEST);
 			return true;
 		case R.id.menuexit:
@@ -94,6 +94,17 @@ public class AppendActivity extends Activity {
 
 		}
 		return false;
+	}
+	protected void onActivityResult(int requestCode,int resultCode,Intent data){
+		super.onActivityResult(requestCode,resultCode,data);
+		if(data != null && requestCode == VIEW_REQUEST && resultCode == RESULT_OK){
+			Bundle extras = data.getExtras();
+			if (extras != null) {
+				MyDrawable mydraw = extras.getParcelable("background");
+				mPb.clear();
+				mPb.add(mydraw);
+			}
+		}
 	}
 
 }

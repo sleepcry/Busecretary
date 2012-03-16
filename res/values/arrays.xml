@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="colorpalette">
+        <item name="black">#000</item>
+        <item name="green1">#050</item>
+        <item name="green2">#0a0</item>
+        <item name="green3">#0f0</item>
+        <item name="blue">#00f</item>
+        <item name="cyan1">#05f</item>
+        <item name="cyan2">#0af</item>
+        <item name="cyan3">#0ff</item>
+        <item name="red">#f00</item>
+        <item name="yellow1">#f50</item>
+        <item name="yellow2">#fa0</item>
+        <item name="yellow3">#ff0</item>
+        <item name="pink1">#f0f</item>
+        <item name="pink2">#f5f</item>
+        <item name="pink3">#faf</item>
+        <item name="gray">#fff</item>
+    </array>
+
+    <string-array name="loadsource">
+        <item>contact</item>
+        <item>camera</item>
+        <item>image</item>
+    </string-array>
+
+</resources>

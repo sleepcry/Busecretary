@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bs="http://schemas.android.com/apk/res/com.chaos.sleepcry.busecretary"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell1"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell2"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/green1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell3"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/green2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell4"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/green3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell5"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/blue" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell6"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/cyan1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell7"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/cyan2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell8"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/cyan3" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell9"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/red" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell10"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/yellow1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell11"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/yellow2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell12"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/yellow3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell13"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/pink1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell14"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/pink2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell15"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/pink3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <com.chaos.sleepcry.busecretary.colorpalette.ColorCell
+                android:id="@+id/cell16"
+                style="@style/colorcellstyle"
+                bs:elemcolor="@color/gray" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

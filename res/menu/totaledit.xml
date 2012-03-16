@@ -6,5 +6,9 @@
         android:title="@string/menuredo"></item>
     <item android:id="@+id/menuclear"
         android:title="@string/menuclear"></item>
+    <item android:id="@+id/menushare"
+        android:title="@string/menushare"></item>
+    <item android:id="@+id/menuelements"
+        android:title="@string/menuelements"></item>
 
 </menu>

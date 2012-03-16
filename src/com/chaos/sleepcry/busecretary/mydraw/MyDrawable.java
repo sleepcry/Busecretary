@@ -34,10 +34,10 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		;
 		mDrawable = new BitmapDrawable(BitmapFactory.decodeStream(input));
 		mDrawPos = rectf;
 	}
+	
 	public String toString(){
 		return mUrl;
 	}

@@ -23,4 +23,9 @@
     <string name="sdcardmis">sd card not found</string>
     <string name="deschint">I want to</string>
     <string name="elements">elem</string>
+    <string name="load">load</string>
+    <string name="text">text</string>
+    <string name="menuelements">elem</string>
+    <string name="menushare">share</string>
+    <string name="temptext">type enter after input</string>
 </resources>
