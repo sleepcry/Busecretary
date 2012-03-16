@@ -19,6 +19,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -142,7 +143,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		if (intent != null) {
 			Bundle extras = intent.getExtras();
 			if (extras != null) {
-				MyDrawable mydraw = extras.getParcelable("background");
+				MyDrawable mydraw = extras.getParcelable(PaintBoard.BACKGROUND);
 				mPb.add(mydraw);
 			}
 		}
@@ -470,6 +471,13 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 
 	public void updateContent(Bitmap bitmap) {
 		if (bitmap != null) {
+			Drawable draw = mTempView.getBackground();
+			if(draw != null && draw instanceof BitmapDrawable){
+				Bitmap bmp = ((BitmapDrawable)draw).getBitmap();
+				if(bmp != null){
+					bmp.recycle();
+				}
+			}
 			mTempView.setBackgroundDrawable(new BitmapDrawable(bitmap));
 			mTempView.setVisibility(View.VISIBLE);
 			mTempView.setText("");
