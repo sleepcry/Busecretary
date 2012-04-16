@@ -225,6 +225,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		this.addContentView(v, new LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT));
+		 
 
 	}
 

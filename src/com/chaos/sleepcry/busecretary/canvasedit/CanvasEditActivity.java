@@ -189,7 +189,6 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 
 		});
 	}
-
 	private AnimationListener listener1 = new AnimationListener() {
 
 		@Override
