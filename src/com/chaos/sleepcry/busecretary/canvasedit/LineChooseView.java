@@ -18,14 +18,14 @@ public class LineChooseView extends View {
 		mLineWidth = context.obtainStyledAttributes(attrs, R.styleable.line)
 				.getDimensionPixelSize(R.styleable.line_width, 2);
 		mColor = context.obtainStyledAttributes(attrs, R.styleable.Color)
-				.getColor(R.styleable.Color_elemcolor, Color.BLACK);
+				.getColor(R.styleable.Color_elemcolor, Color.RED);
 		mLineWidth = 3;
 	}
 
 	public LineChooseView(Context context) {
 		super(context);
 		mLineWidth = 3;
-		mColor = Color.BLACK;
+		mColor = Color.RED;
 	}
 
 	public void setColor(int color) {

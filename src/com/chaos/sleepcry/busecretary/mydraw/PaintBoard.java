@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.LOG;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -13,6 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -29,13 +31,8 @@ public class PaintBoard extends View implements OnTouchListener {
 	// all the things once ocur
 	List<Mydraw> mHistory = null;
 	List<AbstractOperation> mOperList = null;
-	MyPolyLine mCurPolyline = null;
-	// current color for new stuffs
-	int mCurColor;
-	int mLineWidth;
 	AbstractOperation mCurOp = null;
 	boolean bEditable;
-	List<PointF> mMoveTrack = null;
 	Context mContext = null;
 	public static final String BACKGROUND = "background";
 
@@ -57,8 +54,7 @@ public class PaintBoard extends View implements OnTouchListener {
 		mHistory = new ArrayList<Mydraw>();
 		mOperList = new ArrayList<AbstractOperation>();
 		this.setOnTouchListener(this);
-		this.setBackgroundColor(Color.WHITE);
-		mCurColor = Color.BLACK;
+		mCurColor = Color.WHITE;
 		bEditable = true;
 		mLineWidth = 3;
 	}
@@ -69,75 +65,144 @@ public class PaintBoard extends View implements OnTouchListener {
 
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		// draw border
-		Paint paint = new Paint();
-		paint.setColor(0x7f7fff7f);
-		paint.setStyle(Style.STROKE);
-		paint.setStrokeWidth(4);
-		canvas.drawRect(new Rect(getLeft(), getTop(), getRight(), getBottom()),
-				paint);
+		
 		for (int i = 0; i < mDrawList.size(); i++) {
 			Mydraw mydraw = mDrawList.get(i);
 			if (mydraw.isVisible()) {
 				mDrawList.get(i).draw(canvas);
 			}
 		}
+		// draw border
+		Paint paint = new Paint();
+		paint.setColor(Color.RED);
+		paint.setStyle(Style.STROKE);
+		paint.setStrokeWidth(4);
+		canvas.drawRect(new Rect(getLeft(), getTop(), getRight(), getBottom()),
+				paint);
 	}
 
+	MyPolyLine mCurPolyline = null;
+	List<PointF> mMoveTrack = null;
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
 		if (!bEditable) {
 			return false;
 		}
+		int pt_cnt = e.getPointerCount();
+		LOG.D("paintboard",""+pt_cnt);
+		if(pt_cnt >= 2 || mbZoom) {
+			mDrawList.remove(mCurPolyline);
+			mbDrawLine = false;
+			return zoom(e);
+		}else {
+			return drawLine(e);
+		}
+	}
+	boolean mbDrawLine = false;
+	// current color for new stuffs
+	int mCurColor;
+	int mLineWidth;
+	private boolean drawLine(MotionEvent e) {
 		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
 		int action = e.getAction();
 		PointF[] pts = null;
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
+			mbDrawLine = true;
 			mMoveTrack = new ArrayList<PointF>();
 			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
 					.getY() - rect.top) / rect.height()));
 			return true;
 		case MotionEvent.ACTION_CANCEL:
-			mDrawList.remove(mCurPolyline);
-			mMoveTrack = null;
-			mCurPolyline = null;
+			if (mbDrawLine) {
+				mbDrawLine = false;
+				mDrawList.remove(mCurPolyline);
+				mMoveTrack = null;
+				mCurPolyline = null;
+			}
 			return true;
 		case MotionEvent.ACTION_MOVE:
-			int historySize = e.getHistorySize();
-			for (int i = 0; i < historySize; i++) {
-				mMoveTrack.add(new PointF((e.getHistoricalX(i) - rect.left)
-						/ rect.width(), (e.getHistoricalY(i) - rect.top)
-						/ rect.height()));
+			if (mbDrawLine) {
+				int historySize = e.getHistorySize();
+				for (int i = 0; i < historySize; i++) {
+					mMoveTrack.add(new PointF((e.getHistoricalX(i) - rect.left)
+							/ rect.width(), (e.getHistoricalY(i) - rect.top)
+							/ rect.height()));
+				}
+				mMoveTrack.add(new PointF(
+						(e.getX() - rect.left) / rect.width(),
+						(e.getY() - rect.top) / rect.height()));
+				pts = new PointF[mMoveTrack.size()];
+				// remove the previous one
+				mDrawList.remove(mCurPolyline);
+				// add the updated one
+				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
+						mCurColor, mDrawList.size(), mLineWidth);
+				mCurPolyline.setView(this);
+				mDrawList.add(mCurPolyline);
+				invalidate();
+				return true;
 			}
-			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
-					.getY() - rect.top) / rect.height()));
-			pts = new PointF[mMoveTrack.size()];
-			// remove the previous one
-			mDrawList.remove(mCurPolyline);
-			// add the updated one
-			mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts), mCurColor,
-					mDrawList.size(), mLineWidth);
-			mCurPolyline.setView(this);
-			mDrawList.add(mCurPolyline);
-			invalidate();
-			return true;
 		case MotionEvent.ACTION_UP:
-			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
-					.getY() - rect.top) / rect.height()));
-			pts = new PointF[mMoveTrack.size()];
-			// remove the previous one
-			mDrawList.remove(mCurPolyline);
-			// add the updated one
-			mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts), mCurColor,
-					mDrawList.size(), mLineWidth);
-			add(mCurPolyline);
-			mMoveTrack = null;
-			mCurPolyline = null;
-			return true;
+			if (mbDrawLine) {
+				mbDrawLine = false;
+				mMoveTrack.add(new PointF(
+						(e.getX() - rect.left) / rect.width(),
+						(e.getY() - rect.top) / rect.height()));
+				pts = new PointF[mMoveTrack.size()];
+				// remove the previous one
+				mDrawList.remove(mCurPolyline);
+				// add the updated one
+				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
+						mCurColor, mDrawList.size(), mLineWidth);
+				add(mCurPolyline);
+				mMoveTrack = null;
+				mCurPolyline = null;
+				return true;
+			}
 		}
 		return false;
 	}
+	
+	boolean mbZoom = false;
+	Point mptZoomDown1 = new Point();
+	Point mptZoomDown2 = new Point();
+	private boolean zoom(MotionEvent e) {
+		int pt_cnt = e.getPointerCount();
+		if(pt_cnt < 2 || mListener == null) {
+			mbZoom = false;
+			return false;
+		}
+		switch (e.getActionMasked()) {
+		case MotionEvent.ACTION_POINTER_DOWN:
+			mbZoom = true;
+			mptZoomDown1.set((int)e.getX(0), (int)e.getY(0));
+			mptZoomDown2.set((int)e.getX(1), (int)e.getY(1));
+			break;
+		case MotionEvent.ACTION_CANCEL:
+			if(mbZoom) {
+				mbZoom = false;
+			}
+			break;
+		case MotionEvent.ACTION_POINTER_UP:
+			if(mbZoom) {
+				mbZoom = false;
+				float x1 = e.getX(0);
+				float y1 = e.getY(0);
+				float x2 = e.getX(1);
+				float y2 = e.getY(1);
+				if(Math.abs(x1-x2) + Math.abs(y1-y2) < 
+					Math.abs(mptZoomDown1.x-mptZoomDown2.x)+Math.abs(mptZoomDown1.y-mptZoomDown2.y)) {
+					mListener.zoomIn((x1+x2)/2,(y1+y2)/2);
+				}else {
+					mListener.zoomOut((x1+x2)/2,(y1+y2)/2);
+				}
+			}
+			break;
+		}
+		return false;
+	}
+
 	public void add(Mydraw draw) {
 		// abandon the tail
 		if (mCurOp != null) {
@@ -225,7 +290,13 @@ public class PaintBoard extends View implements OnTouchListener {
 		invalidate();
 		Log.d("draw", "clear");
 	}
-
+	public void permenantClear() {
+		mOperList.clear();
+		mDrawList.clear();
+		mHistory.clear();
+		//TODO:
+		mCurOp = null;
+	}
 	public Mydraw[] getDrawList() {
 		Mydraw[] mydraws = new Mydraw[mDrawList.size()];
 		return mDrawList.toArray(mydraws);
@@ -283,5 +354,23 @@ public class PaintBoard extends View implements OnTouchListener {
 		Mydraw mydraw = mDrawList.get(position);
 		mydraw.setVisible(!mydraw.isVisible());
 		invalidate();
+	}
+	public static interface PaintBoardListener{
+		public void zoomIn(float x, float y);
+		public void zoomOut(float x,float y);
+		public void doubleClick(float x,float y);
+	}
+
+	PaintBoardListener mListener = null;
+	public void setPBListener(PaintBoardListener listener) {
+		mListener = listener;
+	}
+
+	public int getColor() {
+		return mCurColor;
+	}
+
+	public int getLineWidth() {
+		return mLineWidth;
 	}
 }

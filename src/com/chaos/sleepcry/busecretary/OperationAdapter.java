@@ -8,7 +8,6 @@ import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -169,9 +168,10 @@ public class OperationAdapter implements ListAdapter {
 			btn.setText(lstData.get(position).content);
 		}
 		btn.setTextSize(20);
-		btn.setBackgroundColor(Color.WHITE);
-		btn.setShadowLayer(10, 2, 2, 0xff7fff7f);
+		btn.setTextColor(Color.WHITE);
+		btn.setShadowLayer(10, 2, 2, Color.RED);
 		btn.setOnClickListener(mCtxt);
+		btn.setBackgroundResource(R.drawable.transluent);
 		btn.setId(lstData.get(position).id);
 		return btn;
 	}

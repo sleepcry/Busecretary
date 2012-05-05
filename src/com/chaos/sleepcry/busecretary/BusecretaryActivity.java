@@ -12,6 +12,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -44,6 +45,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	private MainView mCur = null;
 	private MainView mNext = null;
 	private MainView mPrevious = null;
+	private Bitmap mCurBmp = null;
 	DatePickerView mdpv = null;
 	/*
 	 * the date used to define a notification
@@ -60,7 +62,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	/*
 	 * @{ fields definition
 	 */
-	public static final int DB_VER = 5;
+	public static final int DB_VER = 7;
 	public static final String NOTI_ID = "noti_id";
 	public static final int ROLLBACK = 0;
 	public static final int COMMIT_NEXT = 1;
@@ -157,7 +159,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 					mTotalOffset = 0;
 					break;
 				case MotionEvent.ACTION_UP:
-					double orientation = Math.abs(getOrientation(mPosDown,mPosCur));
+					double orientation = Math.abs(getOrientation(mPosDown,
+							mPosCur));
 					int half = BusecretaryActivity.this.getWindowManager()
 							.getDefaultDisplay().getHeight() / 2;
 					if (orientation >= Math.PI / 4 && mPosCur.y > half
@@ -178,12 +181,12 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 							mode = COMMIT_PREVIOUS;
 						}
 					} else if (mTotalOffset > 0
-							&& mTotalOffset > mWidthPixel / 2) {
+							&& mTotalOffset > Math.min(mWidthPixel / 2,150)) {
 						// move to next
 						movePrevious();
 						mode = COMMIT_PREVIOUS;
 					} else if (mTotalOffset < 0
-							&& mTotalOffset < -mWidthPixel / 2) {
+							&& mTotalOffset < -Math.min(mWidthPixel / 2,150)) {
 						// move to previous
 						moveNext();
 						mode = COMMIT_NEXT;
@@ -203,7 +206,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 					}
 					mPosCur.set((int) motion.getX(), (int) motion.getY());
 
-					double orientation2 = Math.abs(getOrientation(mPosDown,mPosCur));
+					double orientation2 = Math.abs(getOrientation(mPosDown,
+							mPosCur));
 					if (orientation2 >= Math.PI / 4) {
 						break;
 					}
@@ -225,11 +229,10 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		this.addContentView(v, new LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT));
-		 
 
 	}
 
-	public static final double getOrientation(Point p1,Point p2) {
+	public static final double getOrientation(Point p1, Point p2) {
 		if (p2.x == p1.x) {
 			return 0;
 		}
@@ -246,8 +249,9 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			switch (id) {
 			// when
 			case OperationAdapter.WHEN:
-				mdpv = new DatePickerView(this);
-				AlertDialog dlg1 = new AlertDialog.Builder(this)
+				Calendar cal = mCurNoti.getDay().getCalendar();
+				mdpv = new DatePickerView(this,cal!=null?cal.getTimeInMillis():System.currentTimeMillis());
+				new AlertDialog.Builder(this)
 						.setView(mdpv)
 						.setPositiveButton(R.string.ok,
 								new DialogInterface.OnClickListener() {
@@ -261,9 +265,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 
 									}
 
-								}).setNegativeButton(R.string.cancel, null)
-						.create();
-				dlg1.show();
+								}).show();
 				break;
 			// where
 			case OperationAdapter.WHERE:
@@ -389,7 +391,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			 */
 			mDB.insert(mCurNoti.getId(), mCurNoti.getDay().getCalendar()
 					.getTimeInMillis(), mCurNoti.getDesc(), mCurNoti.getRing(),
-					mCurNoti.getCategory().getId(), mCurNoti.getBmp());
+					mCurNoti.getCategory().getId(), mCur.getBmp());
 			// synchronize the list
 			mLstNotis.add(mCurNoti.getLocation(), mCurNoti);
 		}
@@ -561,6 +563,19 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 						mCurNoti.getLocation() + 1);
 			}
 		}
+		switch (mode) {
+		case COMMIT_NEXT:
+			if (next != null) {
+				next.setBmp(null);
+			}
+			break;
+		case COMMIT_PREVIOUS:
+			if(pre != null) {
+				pre.setBmp(null);
+			}
+			break;
+		}
+
 		notifyUI(pre, mCurNoti, next);
 	}
 

@@ -17,7 +17,7 @@ public class ColorPalette extends LinearLayout implements OnClickListener {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.colorpalette, this);
 		init();
-		mColor = Color.BLACK;
+		mColor = Color.WHITE;
 	}
 
 	private void init() {
@@ -44,7 +44,7 @@ public class ColorPalette extends LinearLayout implements OnClickListener {
 		super(context, attrs);
 		LayoutInflater.from(context).inflate(R.layout.colorpalette, this);
 		init();
-		mColor = Color.BLACK;
+		mColor = Color.WHITE;
 	}
 
 	public int getColor() {

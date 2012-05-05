@@ -16,5 +16,7 @@
         <color name="pink2">#f5f</color>
         <color name="pink3">#faf</color>
         <color name="gray">#fff</color>
+        <color name="white">#fff</color>
+        <drawable name="transluent">#0fff</drawable>
     
 </resources>

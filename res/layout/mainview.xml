@@ -3,75 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <!--
-    <Button
-        android:id="@+id/btn_date_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/normal_btn"
-        android:text="today"
-        android:textColor="#FFF"
-        android:textSize="20dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-
-    <Button
-        android:id="@+id/btn_time_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/normal_btn"
-        android:text="17:24:30"
-        android:textColor="#FFF"
-        android:textSize="20dp" >
-    </Button>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-
-    <EditText
-        android:id="@+id/et_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:selectAllOnFocus="true"
-        android:textSize="20dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-
-    <Button
-        android:id="@+id/btn_ring_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/normal_btn"
-        android:text="choose a ring here..."
-        android:textColor="#F7F"
-        android:textSize="12dp" 
-        android:gravity="left"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCC" />
-
-    <Button
-        android:id="@+id/btn_repeat_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/normal_btn"
-        android:text="none"
-        android:textColor="#FFF"
-        android:textSize="20dp" />
-    -->
-
+    
     <com.chaos.sleepcry.busecretary.mydraw.PaintBoard
         android:id="@+id/mainsurface"
         android:layout_width="match_parent"

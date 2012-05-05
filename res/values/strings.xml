@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
 
-    <string name="hello">Hello World, BusecretaryActivity!</string>
-    <string name="app_name">Busecretary</string>
+    <string name="app_name">Drawing TODO</string>
 	<string name="str_date">Date</string>
 	<string name="str_time">Time</string>
 	<string name="str_desc">Description</string>
 	<string name="str_ring">Ring</string>
 	<string name="str_categ">Category</string>
 	<string name="loading_desc">remember your underwear</string>
-    <string name="title">I want to</string>
+    <string name="title">I will ... </string>
     <string name="next">next</string>
     <string name="menuview">view</string>
     <string name="menuundo">undo</string>
@@ -21,11 +20,23 @@
     <string name="cancel">cancel</string>
     <string name="ring">choose a ring here...</string>
     <string name="sdcardmis">sd card not found</string>
-    <string name="deschint">I want to</string>
+    <string name="deschint">I will ...</string>
     <string name="elements">elem</string>
     <string name="load">load</string>
     <string name="text">text</string>
     <string name="menuelements">elem</string>
     <string name="menushare">share</string>
     <string name="temptext">type enter after input</string>
+    <string name="alert">alert</string>
+    <string name="alert_exit_edit">This will combine the image as one and loss the layer information. Are you sure to continue?</string>
+   <string name="loadtitle">Load content from:</string>
+   <string name="autosave">TODO saved succeed! </string>
+   <string name="hour">hour</string>
+   <string name="minute">minute</string>
+   <string name="day">day</string>
+   <string name="month">month</string>
+   <string name="where">where</string>
+   <string name="when">when</string>
+   <string name="what">what</string>
+   <string name="how">how</string>
 </resources>

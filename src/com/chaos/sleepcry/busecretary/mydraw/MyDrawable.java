@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -14,12 +15,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class MyDrawable extends Mydraw implements Parcelable {
-	Drawable mDrawable;
+	BitmapDrawable mDrawable;
 	RectF mDrawPos;
 	String mUrl = null;
 	static Context msCtxt = null;
 
-	public MyDrawable(Drawable d, RectF rectf, int layer) {
+	public MyDrawable(BitmapDrawable d, RectF rectf, int layer) {
 		super(layer);
 		mDrawable = d;
 		mDrawPos = rectf;
@@ -39,8 +40,16 @@ public class MyDrawable extends Mydraw implements Parcelable {
 	}
 	
 	public String toString(){
-		return mUrl;
+		if(mUrl==null||mUrl.length() == 0) {
+			return "image";
+		}else {
+			return mUrl;
+		}
 	}
+	public Bitmap getBmp() {
+		return mDrawable!=null?mDrawable.getBitmap():null;
+	}
+	
 	/*
 	 * this should be invoked before you take this class as a parcelable
 	 */

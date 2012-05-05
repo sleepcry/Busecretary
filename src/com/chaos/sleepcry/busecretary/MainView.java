@@ -1,7 +1,7 @@
 package com.chaos.sleepcry.busecretary;
 
 import android.database.Cursor;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
+import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 
@@ -43,12 +44,9 @@ public class MainView extends LinearLayout implements OnClickListener {
 		mPb = (PaintBoard) findViewById(R.id.mainsurface);
 		mPb.setEditable(false);
 		mAdapter = new OperationAdapter(context);
-		Button btn = new Button(context);
-		btn.setTextSize(20);
+		Button btn = (Button) LayoutInflater.from(context).inflate(R.layout.normalbtn, null);
 		btn.setText("more...");
 		btn.setOnClickListener(this);
-		btn.setBackgroundColor(Color.WHITE);
-		btn.setShadowLayer(10, 2, 2, 0xff7fff7f);
 		mList.addFooterView(btn);
 		mList.setAdapter(mAdapter);
 
@@ -143,10 +141,14 @@ public class MainView extends LinearLayout implements OnClickListener {
 			mBtnRepeatDesc
 					.setText("Category:  " + data.getCategory().getDesc());
 		}
-		MyDrawable mydraw = new MyDrawable(new BitmapDrawable(data.getBmp()),
-				new RectF(0, 0, 1, 1), 0);
-		mPb.clear();
-		mPb.add(mydraw);
+		if (data.getBmp() == null) {
+			MyDrawable mydraw = new MyDrawable(new BitmapDrawable(
+					data.getBmpPath()), new RectF(0, 0, 1, 1), 0);
+			data.setBmp(mydraw.getBmp());
+			mPb.permenantClear();
+			mPb.add(mydraw);
+			mPb.invalidate();
+		}
 	}
 	public void collapse(){
 		mAdapter.collapse();
@@ -181,6 +183,16 @@ public class MainView extends LinearLayout implements OnClickListener {
 	}
 
 	public void pause() {
+	}
+	public Bitmap getBmp() {
+		if(mPb != null){
+			Mydraw[] draws= mPb.getDrawList();
+			if(draws != null && draws.length > 0 && draws[0] instanceof MyDrawable) {
+				MyDrawable drawable =(MyDrawable)draws[0]; 
+				return drawable.getBmp();
+			}
+		}
+		return null;
 	}
 
 }

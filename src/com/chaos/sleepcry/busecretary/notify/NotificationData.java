@@ -14,7 +14,8 @@ public class NotificationData {
 	private String mRing;
 	private RepeatCategory mCategory;
 	private int mLocation = 0; // the current record location in the total
-	Bitmap mBmp;
+	String mBmpPath;
+	Bitmap mBitMap;
 
 	public NotificationData() {
 		this(0, -1);
@@ -29,7 +30,7 @@ public class NotificationData {
 		mRing = null;
 		mCategory = RepeatCategory.NONE;
 		mLocation = loc;
-		mBmp = Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);
+		mBmpPath = null;
 	}
 
 	/*@{
@@ -82,10 +83,16 @@ public class NotificationData {
 	public int getId() {
 		return mId;
 	}
-	public Bitmap getBmp(){
-		return mBmp;
+	public String getBmpPath(){
+		return mBmpPath;
 	}
-	public void setBmp(Bitmap bmp){
-		this.mBmp = bmp;
+	public void setBmpPath(String bmp){
+		this.mBmpPath = bmp;
+	}
+	public Bitmap getBmp() {
+		return mBitMap;
+	}
+	public void setBmp(Bitmap bmp) {
+		mBitMap = bmp;
 	}
 }

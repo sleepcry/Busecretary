@@ -7,8 +7,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,8 +25,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,12 +36,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -52,16 +59,19 @@ import android.widget.TextView.OnEditorActionListener;
 import com.chaos.sleepcry.busecretary.BusecretaryActivity;
 import com.chaos.sleepcry.busecretary.PaneAnimation;
 import com.chaos.sleepcry.busecretary.R;
+import com.chaos.sleepcry.busecretary.append.AppendActivity;
 import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette;
 import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette.OnColorChangedListener;
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.MyPolyLine;
 import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
+import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
 
 public class CanvasEditActivity extends Activity implements OnTouchListener {
 	PaintBoard mPb = null;
 	ListView mList = null;
+	boolean mbAnimating = false;
 	PaneAnimation mAnim = null;
 	int mHeight;
 	// the point when pressed
@@ -77,6 +87,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 	Button mLoad, mText;
 	ContentStatus mStatus;
 	Bitmap mTempBmp = null;
+	float density;
 
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -86,6 +97,29 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		LayoutInflater.from(this).inflate(R.layout.canvas, mBaseView);
 		this.setContentView(mBaseView);
 		mPb = (PaintBoard) findViewById(R.id.surfaceView1);
+		mPb.setPBListener(new PaintBoardListener() {
+
+			@Override
+			public void zoomIn(float x, float y) {
+				if (mStatus.isNormalDrawing()) {
+					complete();
+				} else {
+					// TODO:
+				}
+			}
+
+			@Override
+			public void zoomOut(float x, float y) {
+				// TODO:
+			}
+
+			@Override
+			public void doubleClick(float x, float y) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 		mColorPal = (ColorPalette) findViewById(R.id.cp);
 		mLine = (LineChooseView) findViewById(R.id.lcv);
 		mSeekBar = (SeekBar) findViewById(R.id.seekbar1);
@@ -96,22 +130,24 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 
 			@Override
 			public void onClick(View view) {
-				mStatus.beginPutContent();
+				mStatus.beginPutContent(mTempView.getText().length() == 0 ? ContentStatus.PUT_IMAGE
+						: ContentStatus.PUT_TEXT);
 			}
 
 		});
 		mTempText = (EditText) findViewById(R.id.ettemp);
-		mTempText.setOnEditorActionListener(new OnEditorActionListener() {
+		mTempText.setOnKeyListener(new OnKeyListener() {
 
 			@Override
-			public boolean onEditorAction(TextView view, int id, KeyEvent event) {
-				updateContent(mTempText.getText().toString());
-				mTempText.setVisibility(View.GONE);
-				mTempView.setVisibility(View.VISIBLE);
-				return true;
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (event.getAction() == KeyEvent.ACTION_UP) {
+					mTempText.setText(mTempView.getText());
+				}
+				return false;
 			}
 
 		});
+
 		mTempView.setVisibility(View.GONE);
 		mLoad = (Button) findViewById(R.id.load);
 		mText = (Button) findViewById(R.id.text);
@@ -123,6 +159,8 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 				if (fromUser) {
 					mLine.setLineWidth(progress);
 					mPb.setLineWidth(progress);
+					mTempText.setTextSize(progress * density * 2);
+					mTempView.setTextSize(progress * density * 2);
 				}
 
 			}
@@ -137,7 +175,6 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 			public void onStopTrackingTouch(SeekBar sb) {
 				mSeekBar.setVisibility(View.GONE);
 			}
-
 		});
 		Intent intent = getIntent();
 		if (intent != null) {
@@ -168,7 +205,6 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				mPb.changeVisibility(position);
-				// mList.setItemChecked(position,!mList.isItemChecked(position));
 				mList.invalidateViews();
 			}
 
@@ -185,14 +221,24 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 			public void onColorChange(int color) {
 				mPb.setColor(color);
 				mLine.setColor(color);
+				mTempView.setTextColor(color);
+				mTempText.setTextColor(color);
+				mTempText.setBackgroundColor((~color) | 0xff101010);
 			}
 
 		});
+
+		mList.setCacheColorHint(0);
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		this.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+		density = outMetrics.density;
 	}
+
 	private AnimationListener listener1 = new AnimationListener() {
 
 		@Override
 		public void onAnimationEnd(Animation arg0) {
+			mbAnimating = false;
 			mList.setVisibility(View.VISIBLE);
 			mList.setOnTouchListener(CanvasEditActivity.this);
 		}
@@ -204,6 +250,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		@Override
 		public void onAnimationStart(Animation arg0) {
 			mList.setOnTouchListener(null);
+			mbAnimating = true;
 		}
 
 	};
@@ -213,6 +260,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		public void onAnimationEnd(Animation arg0) {
 			mList.setVisibility(View.GONE);
 			mList.setOnTouchListener(CanvasEditActivity.this);
+			mbAnimating = false;
 		}
 
 		@Override
@@ -222,50 +270,63 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		@Override
 		public void onAnimationStart(Animation arg0) {
 			mList.setOnTouchListener(null);
+			mbAnimating = true;
 		}
 
 	};
 
 	public void load(View v) {
-		AlertDialog dlg = new AlertDialog.Builder(this).setItems(
-				R.array.loadsource, new DialogInterface.OnClickListener() {
+		if (!mStatus.isNormalDrawing()) {
+			return;
+		}
+		new AlertDialog.Builder(this)
+				.setItems(R.array.loadsource,
+						new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent();
-						switch (which) {
-						case 0:
-							// load from contact
-							intent.setAction(Intent.ACTION_PICK);
-							intent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-							break;
-						case 1:
-							// load from camera
-							intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-							break;
-						case 2:
-							// load from image
-							intent.setAction(Intent.ACTION_GET_CONTENT);
-							intent.addCategory(Intent.CATEGORY_DEFAULT);
-							intent.addCategory(Intent.CATEGORY_OPENABLE);
-							intent.setType("image/*");
-							break;
-						}
-						dialog.dismiss();
-						startActivityForResult(intent, which);
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								Intent intent = new Intent();
+								switch (which) {
+								case 0:
+									// load from contact
+									intent.setAction(Intent.ACTION_PICK);
+									intent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+									break;
+								case 1:
+									// load from camera
+									intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+									break;
+								case 2:
+									// load from image
+									intent.setAction(Intent.ACTION_GET_CONTENT);
+									intent.addCategory(Intent.CATEGORY_DEFAULT);
+									intent.addCategory(Intent.CATEGORY_OPENABLE);
+									intent.setType("image/*");
+									break;
+								}
+								dialog.dismiss();
+								startActivityForResult(intent, which);
 
-					}
-				}).create();
-		dlg.show();
+							}
+						}).setTitle(R.string.loadtitle)
+				.setIcon(android.R.drawable.ic_input_get).show();
 	}
 
 	public void addText(View v) {
 		if (mStatus.isNormalDrawing()) {
 			mTempText.setVisibility(View.VISIBLE);
 			mTempView.setVisibility(View.GONE);
+			mTempText.bringToFront();
 			mTempText.requestFocus();
+			mTempText.setText(null);
+			InputMethodManager imm = (InputMethodManager) this
+					.getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(mTempText, 0);
+			mPb.setEditable(false);
 		} else {
 			mStatus.endPutContent();
+			mPb.setEditable(true);
 		}
 	}
 
@@ -278,30 +339,60 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		int action = motion.getAction();
 		if (mList.getVisibility() == View.GONE) {
 			boolean ret = mBaseView.dispatchTouchEvent(motion);
-			if (!mStatus.isNormalDrawing() && !ret) {
+			if (!ret) {
+				if (mTempText.getVisibility() == View.VISIBLE) {
+					mTempText.setVisibility(View.GONE);
+					mTempView.setVisibility(View.VISIBLE);
+					mTempView.setText(mTempText.getText());
+					return true;
+				}
 				MyDrawable draw = null;
 				Rect rect = null;
-				switch (action) {
-				case MotionEvent.ACTION_DOWN:
-					mPosDown.set((int) motion.getX(), (int) motion.getY());
-					rect = new Rect(mPosDown.x, mPosDown.y, mPosDown.x + 1,
-							mPosDown.y + 1);
-					draw = new MyDrawable(new BitmapDrawable(mTempBmp),
-							getRelativeRect(rect), 1);
-					mPb.undo();
-					mPb.add(draw);
+				switch (mStatus.getFlag()) {
+				case ContentStatus.PUT_IMAGE:
+					switch (action) {
+					case MotionEvent.ACTION_DOWN:
+						mPosDown.set((int) motion.getX(), (int) motion.getY());
+						rect = new Rect(mPosDown.x, mPosDown.y, mPosDown.x + 1,
+								mPosDown.y + 1);
+						draw = new MyDrawable(new BitmapDrawable(mTempBmp),
+								getRelativeRect(rect), 1);
+						mPb.undo();
+						mPb.add(draw);
+						break;
+					case MotionEvent.ACTION_MOVE:
+					case MotionEvent.ACTION_UP:
+						rect = new Rect(Math.min(mPosDown.x,
+								(int) motion.getX()), Math.min(mPosDown.y,
+								(int) motion.getY()), Math.max(mPosDown.x,
+								(int) motion.getX()), Math.max(mPosDown.y,
+								(int) motion.getY()));
+						RectF rectf = getRelativeRect(rect);
+						draw = new MyDrawable(new BitmapDrawable(mTempBmp),
+								rectf, 1);
+						mPb.undo();
+						mPb.add(draw);
+						break;
+					}
 					break;
-				case MotionEvent.ACTION_MOVE:
-				case MotionEvent.ACTION_UP:
-					rect = new Rect(Math.min(mPosDown.x, (int) motion.getX()),
-							Math.min(mPosDown.y, (int) motion.getY()),
-							Math.max(mPosDown.x, (int) motion.getX()),
-							Math.max(mPosDown.y, (int) motion.getY()));
-					RectF rectf = getRelativeRect(rect);
-					draw = new MyDrawable(new BitmapDrawable(mTempBmp), rectf,
-							1);
-					mPb.undo();
-					mPb.add(draw);
+				case ContentStatus.PUT_TEXT:
+					// TODO:
+					switch (action) {
+					case MotionEvent.ACTION_DOWN:
+					case MotionEvent.ACTION_MOVE:
+					case MotionEvent.ACTION_UP:
+					case MotionEvent.ACTION_CANCEL:
+						rect = new Rect((int) motion.getX()
+								- mTempView.getWidth() / 2, (int) motion.getY()
+								- mTempView.getHeight() / 2,
+								(int) motion.getX() + mTempView.getWidth() / 2,
+								(int) motion.getY() + mTempView.getHeight() / 2);
+						RectF rectf = getRelativeRect(rect);
+						draw = new MyDrawable(new BitmapDrawable(mTempBmp),
+								rectf, 1);
+						mPb.undo();
+						mPb.add(draw);
+					}
 					break;
 				}
 			}
@@ -389,11 +480,33 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		return false;
 	}
 
-	public void onBackPressed() {
+	private void complete() {
 		Intent intent = new Intent();
 		intent.putExtra(PaintBoard.BACKGROUND, mPb.toParcel());
 		setResult(RESULT_OK, intent);
 		finish();
+		this.overridePendingTransition(R.anim.zoom_fade_out,
+				R.anim.zoom_fade_in);
+	}
+
+	public void onBackPressed() {
+		if (mList.getVisibility() == View.GONE) {
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.alert)
+					.setMessage(R.string.alert_exit_edit)
+					.setPositiveButton(android.R.string.yes,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface arg0,
+										int arg1) {
+									complete();
+								}
+							}).setNegativeButton(android.R.string.no, null)
+					.show();
+		} else if (!mbAnimating) {
+			mList.setVisibility(View.GONE);
+		}
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -453,12 +566,14 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 				// return from camera
 			case 2:
 				// return from image picker
+				
 				AssetFileDescriptor afd;
 				try {
-					afd = getContentResolver()
-							.openAssetFileDescriptor(uri, "r");
-					bitmap = BitmapFactory
-							.decodeStream(afd.createInputStream());
+					bitmap = (Bitmap) data.getExtras().get("data");
+//					afd = getContentResolver()
+//							.openAssetFileDescriptor(uri, "r");
+//					bitmap = BitmapFactory
+//							.decodeStream(afd.createInputStream());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -470,25 +585,28 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 
 	public void updateContent(Bitmap bitmap) {
 		if (bitmap != null) {
+			mPb.setEditable(false);
 			Drawable draw = mTempView.getBackground();
-			if(draw != null && draw instanceof BitmapDrawable){
-				Bitmap bmp = ((BitmapDrawable)draw).getBitmap();
-				if(bmp != null){
+			if (draw != null && draw instanceof BitmapDrawable) {
+				Bitmap bmp = ((BitmapDrawable) draw).getBitmap();
+				if (bmp != null) {
 					bmp.recycle();
 				}
 			}
 			mTempView.setBackgroundDrawable(new BitmapDrawable(bitmap));
 			mTempView.setVisibility(View.VISIBLE);
+			mTempText.setVisibility(View.GONE);
 			mTempView.setText("");
 		}
 	}
 
 	public void updateContent(String name) {
 		if (name != null) {
+			mPb.setEditable(false);
 			mTempView.setText(name);
-			mTempView.setTextColor(Color.BLACK);
 			mTempView.setVisibility(View.VISIBLE);
-			mTempView.setBackgroundColor(0x00ffffff);
+			mTempText.setVisibility(View.GONE);
+			mTempView.setBackgroundResource(R.drawable.transluent);
 		}
 
 	}
@@ -497,6 +615,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 		private int flags;
 		private static final int PUT_IMAGE = 1;
 		private static final int NORMAL_DRAWING = 2;
+		private static final int PUT_TEXT = 3;
 
 		public ContentStatus() {
 			flags = NORMAL_DRAWING;
@@ -506,17 +625,29 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 			return flags == NORMAL_DRAWING;
 		}
 
-		public void beginPutContent() {
+		public int getFlag() {
+			return flags;
+		}
+
+		public void beginPutContent(int flag) {
 			if (isNormalDrawing()) {
-				flags = PUT_IMAGE;
+				flags = flag;
 				mLoad.setVisibility(View.GONE);
 				mText.setText(R.string.ok);
 				mTempBmp = Bitmap.createBitmap(mTempView.getWidth(),
 						mTempView.getHeight(), Bitmap.Config.ARGB_8888);
+				if (flag == PUT_TEXT) {
+					mTempView.setBackgroundResource(R.drawable.transluent);
+				}
 				Canvas canvas = new Canvas(mTempBmp);
 				mTempView.draw(canvas);
-				mPb.setEditable(false);
-				mPb.add(new MyPolyLine());
+				Rect rect = new Rect(mTempView.getLeft(), mTempView.getTop(),
+						mTempView.getRight(), mTempView.getBottom());
+				RectF rectf = getRelativeRect(rect);
+				MyDrawable draw = new MyDrawable(new BitmapDrawable(mTempBmp),
+						rectf, 1);
+				mPb.add(draw);
+				mTempView.setVisibility(View.GONE);
 			}
 		}
 
@@ -528,5 +659,43 @@ public class CanvasEditActivity extends Activity implements OnTouchListener {
 			mTempText.setVisibility(View.GONE);
 			mPb.setEditable(true);
 		}
+	}
+
+	protected void loadPrefs() {
+		SharedPreferences prefs = this.getSharedPreferences(
+				AppendActivity.SHAREPREF, 0);
+		if (prefs.contains(AppendActivity.COLOR)) {
+			int color = prefs.getInt(AppendActivity.COLOR, Color.WHITE);
+			mPb.setColor(color);
+			mLine.setColor(color);
+			mTempView.setTextColor(color);
+			mTempText.setTextColor(color);
+			mTempText.setBackgroundColor((~color) | 0xff101010);
+		}
+		if (prefs.contains(AppendActivity.LINE_WIDTH)) {
+			int width = prefs.getInt(AppendActivity.LINE_WIDTH, 3);
+			mPb.setLineWidth(width);
+			mLine.setLineWidth(width);
+			mTempText.setTextSize(width * density * 2);
+			mTempView.setTextSize(width * density * 2);
+		}
+	}
+
+	protected void savePref() {
+		Editor editor = getSharedPreferences(AppendActivity.SHAREPREF, 0)
+				.edit();
+		editor.putInt(AppendActivity.COLOR, mPb.getColor());
+		editor.putInt(AppendActivity.LINE_WIDTH, mPb.getLineWidth());
+		editor.commit();
+	}
+
+	public void onResume() {
+		super.onResume();
+		loadPrefs();
+	}
+
+	public void onPause() {
+		super.onPause();
+		savePref();
 	}
 }
