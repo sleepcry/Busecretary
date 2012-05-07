@@ -11,7 +11,13 @@ public class ColorItem implements Comparable<ColorItem>{
 	}
 	@Override
 	public int compareTo(ColorItem another) {
-		return (int) (lastUseTime - another.lastUseTime);
+		return (int) (another.lastUseTime-lastUseTime);
+	}
+	public int getColor(){
+		return color;
+	}
+	public void setColor(int color){
+		this.color = color;
 	}
 
 }

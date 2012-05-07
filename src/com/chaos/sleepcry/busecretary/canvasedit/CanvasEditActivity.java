@@ -3,7 +3,9 @@ package com.chaos.sleepcry.busecretary.canvasedit;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import utils.LOG;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -44,35 +46,33 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.SimpleAdapter.ViewBinder;
 import android.widget.TextView;
 
 import com.chaos.sleepcry.busecretary.BusecretaryActivity;
 import com.chaos.sleepcry.busecretary.PaneAnimation;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.append.AppendActivity;
+import com.chaos.sleepcry.busecretary.colorpalette.ColorItem;
 import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette;
+import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette.ColorProvider;
 import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette.OnColorChangedListener;
+import com.chaos.sleepcry.busecretary.colorpalette.ColorPickerDialog;
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.MyText;
-import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
 
-public class CanvasEditActivity extends Activity implements OnTouchListener, View.OnClickListener {
+public class CanvasEditActivity extends Activity implements OnTouchListener,
+		ColorPickerDialog.OnColorChangedListener, ColorProvider {
 	PaintBoard mPb = null;
-	ExpandableListView mList = null;
+	ListView mList = null;
 	boolean mbAnimating = false;
 	PaneAnimation mAnim = null;
 	int mHeight;
@@ -92,6 +92,11 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 	ImageView mStatusImage = null;
 	int mTextSize = 18;
 	float density;
+
+	public static final int GET_IMAGE = 0;
+	public static final int GET_CAMERA = 1;
+	public static final int GET_CONTACT = 2;
+	public static final int SETTINGS = 3;
 
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -180,8 +185,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 				mPb.add(mydraw);
 			}
 		}
-		mList = new ExpandableListView(this);
-		
+		mList = new ListView(this);
 		mHeight = this.getWindowManager().getDefaultDisplay().getHeight();
 		mAnim = new PaneAnimation(0, 0, 0, 500);
 		mAnim.setInterpolator(new AccelerateInterpolator());
@@ -189,7 +193,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 				LayoutParams.MATCH_PARENT);
 		this.addContentView(mList, mParams);
 		mList.setBackgroundColor(0x7f7fff7f);
-		mList.setAdapter(new DrawElemAdapter(this,mPb.getDrawList()));
+		mList.setAdapter(new DrawElemAdapter(this, mPb.getDrawList()));
 		mList.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 		mAnim.addY(-mHeight);
 		mAnim.setAnimationListener(listener2);
@@ -222,6 +226,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 			mbAnimating = false;
 			mList.setVisibility(View.VISIBLE);
 			mList.setOnTouchListener(CanvasEditActivity.this);
+			mList.setClickable(true);
 		}
 
 		@Override
@@ -240,7 +245,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 		@Override
 		public void onAnimationEnd(Animation arg0) {
 			mList.setVisibility(View.GONE);
-			mList.removeAllViewsInLayout();
+			mList.setAdapter(null);
 			mList.setOnTouchListener(CanvasEditActivity.this);
 			mbAnimating = false;
 		}
@@ -274,12 +279,14 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 										// load from contact
 										intent.setAction(Intent.ACTION_PICK);
 										intent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-										startActivityForResult(intent, which);
+										startActivityForResult(intent,
+												GET_CONTACT);
 										break;
 									case 1:
 										// load from camera
 										intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-										startActivityForResult(intent, which);
+										startActivityForResult(intent,
+												GET_CAMERA);
 										break;
 									case 2:
 										// load from image
@@ -287,7 +294,8 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 										intent.addCategory(Intent.CATEGORY_DEFAULT);
 										intent.addCategory(Intent.CATEGORY_OPENABLE);
 										intent.setType("image/*");
-										startActivityForResult(intent, which);
+										startActivityForResult(intent,
+												GET_IMAGE);
 										break;
 									case 3:
 										// edit text
@@ -297,8 +305,10 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 										mTempText.requestFocus();
 										mTempText.setText(null);
 										InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-										imm.setInputMethod(mTempText.getWindowToken(), "text");
-										imm.showSoftInput(mTempText, InputMethodManager.SHOW_IMPLICIT);
+										
+										imm.showSoftInput(
+												mTempText,
+												InputMethodManager.SHOW_IMPLICIT);
 										mPb.setEditable(false);
 										mStatusImage
 												.setImageResource(R.drawable.pencil);
@@ -461,15 +471,19 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 						.getOrientation(mPosDown, p));
 				int h = Math.min(mHeight / 3, 200);
 				if (orientation >= Math.PI / 4 && p.y > h && mPosDown.y < h) {
-					mAnim.addY(-mHeight);
-					mAnim.setAnimationListener(listener2);
-					mList.startAnimation(mAnim);
+					hideElem();
 					return true;
 				}
 			}
 			break;
 		}
 		return mList.onTouchEvent(motion);
+	}
+
+	private void hideElem() {
+		mAnim.addY(-mHeight);
+		mAnim.setAnimationListener(listener2);
+		mList.startAnimation(mAnim);		
 	}
 
 	protected RectF getRelativeRect(Rect rect) {
@@ -510,8 +524,21 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 			return true;
 		case R.id.menushare:
 			return true;
-		case R.id.menuelements:
+		case R.id.menulayer:
 			showElem();
+			return true;
+		case R.id.menurefresh:
+			mPb.invalidateAll();
+			return true;
+		case R.id.menusetting:
+			Intent intent = new Intent(this, Settings.class);
+			startActivityForResult(intent, SETTINGS);
+			return true;
+		case R.id.menucolor:
+			int width = Math.min(this.getWindowManager().getDefaultDisplay()
+					.getWidth(), this.getWindowManager().getDefaultDisplay()
+					.getHeight()) / 2 - 30;
+			new ColorPickerDialog(this, this, mPb.getColor(), width).show();
 			return true;
 
 		}
@@ -521,8 +548,8 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 	private void showElem() {
 		mAnim.addY(mHeight);
 		mAnim.setAnimationListener(listener1);
-		mList.setAdapter(new DrawElemAdapter(this,mPb.getDrawList()));
-//		mList.invalidateViews();
+		mList.setAdapter(new DrawElemAdapter(this, mPb.getDrawList()));
+		// mList.invalidateViews();
 		mList.startAnimation(mAnim);
 	}
 
@@ -551,7 +578,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 							}).setNegativeButton(android.R.string.no, null)
 					.show();
 		} else if (!mbAnimating) {
-			mList.setVisibility(View.GONE);
+			hideElem();
 		}
 	}
 
@@ -561,7 +588,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 			Uri uri = data.getData();
 			Bitmap bitmap = null;
 			switch (requestCode) {
-			case 0:
+			case GET_CONTACT:
 				// return from contact
 				// original
 				String name = null;
@@ -608,12 +635,12 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 					updateContent(name);
 				}
 				break;
-			case 1:
+			case GET_CAMERA:
 				// return from camera
 				bitmap = (Bitmap) data.getExtras().get("data");
 				updateContent(bitmap);
 				break;
-			case 2:
+			case GET_IMAGE:
 				// return from image picker
 				AssetFileDescriptor afd;
 				try {
@@ -625,6 +652,9 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 					e.printStackTrace();
 				}
 				updateContent(bitmap);
+				break;
+			case SETTINGS:
+				// TODO:
 				break;
 			}
 		}
@@ -691,7 +721,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 					mTempView.getRight(), mTempView.getBottom());
 			RectF rectf = getRelativeRect(rect);
 			MyDrawable draw = new MyDrawable(new BitmapDrawable(mTempBmp),
-					rectf, 1, mPb);
+					rectf, 5, mPb);
 			mCurrentDrawable = draw;
 			mPb.startDrawTemp(draw);
 			mTempView.setVisibility(View.GONE);
@@ -700,7 +730,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 		public void beginPutText() {
 			mLoad.setText(android.R.string.ok);
 			MyText draw = new MyText(mTempView.getText().toString(),
-					new PointF(0, 0), mPb.getColor(), 1, mTextSize, mPb);
+					new PointF(0, 0), mPb.getColor(), 15, mTextSize, mPb);
 			mCurrentText = draw;
 			mPb.startDrawTemp(draw);
 			mTempView.setVisibility(View.GONE);
@@ -712,6 +742,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 			mTempView.setVisibility(View.GONE);
 			mTempText.setVisibility(View.GONE);
 			mPb.commitTemp();
+			mPb.setEditable(true);
 			mCurrentText = null;
 			mCurrentDrawable = null;
 			mStatusImage.setImageResource(R.drawable.paint);
@@ -759,12 +790,29 @@ public class CanvasEditActivity extends Activity implements OnTouchListener, Vie
 	}
 
 	@Override
-	public void onClick(View v) {
-		int pos = (Integer)v.getTag();
-		if(mList.isGroupExpanded(pos)){
-			mList.collapseGroup(pos);
-		}else{
-			mList.expandGroup(pos);
-		}		
+	public void colorChanged(int color) {
+		LOG.D("color",""+color);
+		mPb.setColor(color);
+		mLine.setColor(color);
+		mTempView.setTextColor(color);
+		mTempText.setTextColor(color);
+		mTempText.setBackgroundColor((~color) | 0xff101010);
 	}
+
+    ArrayList<ColorItem> mPreferColors = new ArrayList<ColorItem>();
+	
+
+	public int getCount(){
+		return mPreferColors.size();
+	}
+	public int getColor(int index){
+		if (index < 0 || index >= mPreferColors.size()) {
+			return Color.WHITE;
+		}
+		return mPreferColors.get(index).getColor();
+	}
+	public void prepare() {
+		Collections.sort(mPreferColors);
+	}
+
 }

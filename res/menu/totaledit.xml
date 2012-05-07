@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/menuundo"
-        android:title="@string/menuundo"></item>
-    <item android:id="@+id/menuredo"
-        android:title="@string/menuredo"></item>
-    <item android:id="@+id/menuclear"
-        android:title="@string/menuclear"></item>
-    <item android:id="@+id/menushare"
-        android:title="@string/menushare"></item>
-    <item android:id="@+id/menuelements"
-        android:title="@string/menuelements"></item>
+
+    <item
+        android:id="@+id/menurefresh"
+        android:title="@string/menurefresh">
+    </item>
+    <item
+        android:id="@+id/menulayer"
+        android:title="@string/menulayer">
+    </item>
+    <item 
+        android:id="@+id/menucolor"
+        android:title="@string/menucolor"/>
+    <item
+        android:id="@+id/menuundo"
+        android:title="@string/menuundo">
+    </item>
+    <item
+        android:id="@+id/menuredo"
+        android:title="@string/menuredo">
+    </item>
+    <item
+        android:id="@+id/menuclear"
+        android:title="@string/menuclear">
+    </item>
+    
+    <item
+        android:id="@+id/menushare"
+        android:title="@string/menushare">
+    </item>
+    <item
+        android:id="@+id/menusetting"
+        android:title="@string/menusetting">
+    </item>
 
 </menu>

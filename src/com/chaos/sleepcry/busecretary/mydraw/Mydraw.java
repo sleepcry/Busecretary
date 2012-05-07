@@ -1,6 +1,9 @@
 package com.chaos.sleepcry.busecretary.mydraw;
 
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.MaskFilter;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.view.View;
@@ -19,15 +22,22 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 	public abstract void draw(Canvas canvas);
 
 	public void setLayer(int layer) {
-		mLayer = layer;
-		if (mParent != null) {
-			mParent.invalidateAll();
+		if (mLayer != layer) {
+			mLayer = layer;
+			if (mParent != null) {
+				mParent.invalidateAll();
+			}
 		}
 	}
 
 	public int getLayer() {
 		return mLayer;
 	}
+
+	static protected MaskFilter mBlur = new BlurMaskFilter(8,
+			BlurMaskFilter.Blur.NORMAL);
+	static protected MaskFilter mEmboss = new EmbossMaskFilter(new float[] { 1,
+			1, 1 }, 0.4f, 6, 3.5f);
 
 	@Override
 	public int compareTo(Mydraw another) {
@@ -43,9 +53,11 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 	}
 
 	public void setVisible(boolean val) {
-		bVisiable = val;
-		if (mParent != null) {
-			mParent.invalidateAll();
+		if (bVisiable != val) {
+			bVisiable = val;
+			if (mParent != null) {
+				mParent.invalidateAll();
+			}
 		}
 	}
 

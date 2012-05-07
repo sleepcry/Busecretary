@@ -57,4 +57,7 @@ public class ColorCell extends View{
 	public int getColor() {
 		return mColor;		
 	}
+	public void setColor(int color){
+		mColor = color;
+	}
 }

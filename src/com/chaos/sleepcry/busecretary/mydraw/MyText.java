@@ -25,6 +25,7 @@ public class MyText extends Mydraw {
 		mPathPaint.setAntiAlias(true);
 		mPathPaint.setDither(true);
 		mPathPaint.setTextAlign(Paint.Align.CENTER);
+		mPathPaint.setMaskFilter(mEmboss);
 //		mPathPaint.setFakeBoldText(true);
 		mTextSize = textsize;
 		

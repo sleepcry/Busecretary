@@ -106,7 +106,6 @@ public class PaintBoard extends View implements OnTouchListener {
 		clearTemp();
 		mTempDraw = mydraw;
 		bDrawTemp = true;
-		setEditable(false);
 	}
 	public void clearTemp() {
 		mTempCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
@@ -119,10 +118,15 @@ public class PaintBoard extends View implements OnTouchListener {
 		}
 	}
 	public void commitTemp() {
-		setEditable(true);
 		bDrawTemp = false;
-		mTempCanvas.drawColor(0);
 		add(mTempDraw);
+	}
+	public void cancelTemp(){
+		bDrawTemp = false;
+		invalidate();
+	}
+	public void postInvalidateAll(){
+		
 	}
 	public void invalidateAll() {
 		mCanvas.drawColor(Color.BLACK);
@@ -160,8 +164,10 @@ public class PaintBoard extends View implements OnTouchListener {
 		int pt_cnt = e.getPointerCount();
 		LOG.D("paintboard", "" + pt_cnt);
 		if (pt_cnt >= 2 || mbZoom) {
-			mDrawList.remove(mCurPolyline);
+			cancelTemp();
+			mCurPolyline = null;
 			mbDrawLine = false;
+			mMoveTrack.clear();
 			return zoom(e);
 		} else {
 			return drawLine(e);
@@ -173,7 +179,7 @@ public class PaintBoard extends View implements OnTouchListener {
 	int mCurColor;
 	int mLineWidth;
 	MyPolyLine mCurPolyline = null;
-	List<PointF> mMoveTrack = null;
+	List<PointF> mMoveTrack = new ArrayList<PointF>();
 	private boolean drawLine(MotionEvent e) {
 		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
 		int action = e.getAction();
@@ -181,16 +187,20 @@ public class PaintBoard extends View implements OnTouchListener {
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
 			mbDrawLine = true;
-			mMoveTrack = new ArrayList<PointF>();
+			assert(mMoveTrack.size() == 0);
 			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
 					.getY() - rect.top) / rect.height()));
+			mCurPolyline = new MyPolyLine(null,
+					mCurColor, 10, mLineWidth, this);
+			startDrawTemp(mCurPolyline);
 			return true;
 		case MotionEvent.ACTION_CANCEL:
 			if (mbDrawLine) {
 				mbDrawLine = false;
-				mDrawList.remove(mCurPolyline);
-				mMoveTrack = null;
+//				mDrawList.remove(mCurPolyline);
+				mMoveTrack.clear();
 				mCurPolyline = null;
+				cancelTemp();
 			}
 			return true;
 		case MotionEvent.ACTION_MOVE:
@@ -205,13 +215,16 @@ public class PaintBoard extends View implements OnTouchListener {
 						(e.getX() - rect.left) / rect.width(),
 						(e.getY() - rect.top) / rect.height()));
 				pts = new PointF[mMoveTrack.size()];
-				// remove the previous one
-				mDrawList.remove(mCurPolyline);
-				// add the updated one
-				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
-						mCurColor, mDrawList.size(), mLineWidth, this);
-				mDrawList.add(mCurPolyline);
-				drawMyDraw(mCurPolyline);
+				mMoveTrack.toArray(pts);
+//				// remove the previous one
+//				mDrawList.remove(mCurPolyline);
+//				// add the updated one
+//				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
+//						mCurColor, 10, mLineWidth, this);
+//				mDrawList.add(mCurPolyline);
+//				drawMyDraw(mCurPolyline);
+				mCurPolyline.genPatn(pts);
+				drawTemp();
 				invalidate();
 				return true;
 			}
@@ -222,13 +235,17 @@ public class PaintBoard extends View implements OnTouchListener {
 						(e.getX() - rect.left) / rect.width(),
 						(e.getY() - rect.top) / rect.height()));
 				pts = new PointF[mMoveTrack.size()];
+				mMoveTrack.toArray(pts);
 				// remove the previous one
-				mDrawList.remove(mCurPolyline);
-				// add the updated one
-				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
-						mCurColor, mDrawList.size(), mLineWidth, this);
-				add(mCurPolyline);
-				mMoveTrack = null;
+//				mDrawList.remove(mCurPolyline);
+//				// add the updated one
+//				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
+//						mCurColor, 10, mLineWidth, this);
+//				add(mCurPolyline);
+				mCurPolyline.genPatn(pts);
+				drawTemp();
+				commitTemp();
+				mMoveTrack.clear();
 				mCurPolyline = null;
 				return true;
 			}

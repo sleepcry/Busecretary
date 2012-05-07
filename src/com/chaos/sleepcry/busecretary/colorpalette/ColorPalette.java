@@ -1,5 +1,8 @@
 package com.chaos.sleepcry.busecretary.colorpalette;
 
+import java.util.ArrayList;
+
+import android.R.integer;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -17,40 +20,41 @@ public class ColorPalette extends LinearLayout implements OnClickListener {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.colorpalette, this);
 		init();
-		mColor = Color.WHITE;
 	}
-
+	private ArrayList<ColorCell> mColorCells = new ArrayList<ColorCell>();
 	private void init() {
 		mColorChangedListener = null;
-		findViewById(R.id.cell1).setOnClickListener(this);	
-		findViewById(R.id.cell2).setOnClickListener(this);	
-		findViewById(R.id.cell3).setOnClickListener(this);	
-		findViewById(R.id.cell4).setOnClickListener(this);	
-		findViewById(R.id.cell5).setOnClickListener(this);	
-		findViewById(R.id.cell6).setOnClickListener(this);	
-		findViewById(R.id.cell7).setOnClickListener(this);	
-		findViewById(R.id.cell8).setOnClickListener(this);	
-		findViewById(R.id.cell9).setOnClickListener(this);	
-		findViewById(R.id.cell10).setOnClickListener(this);	
-		findViewById(R.id.cell11).setOnClickListener(this);	
-		findViewById(R.id.cell12).setOnClickListener(this);	
-		findViewById(R.id.cell13).setOnClickListener(this);	
-		findViewById(R.id.cell14).setOnClickListener(this);	
-		findViewById(R.id.cell15).setOnClickListener(this);	
-		findViewById(R.id.cell16).setOnClickListener(this);		
+		mColorCells.add((ColorCell)findViewById(R.id.cell1));
+		mColorCells.add((ColorCell)findViewById(R.id.cell2));
+		mColorCells.add((ColorCell)findViewById(R.id.cell3));
+		mColorCells.add((ColorCell)findViewById(R.id.cell4));
+		mColorCells.add((ColorCell)findViewById(R.id.cell5));
+		mColorCells.add((ColorCell)findViewById(R.id.cell6));
+		mColorCells.add((ColorCell)findViewById(R.id.cell7));
+		mColorCells.add((ColorCell)findViewById(R.id.cell8));
+		mColorCells.add((ColorCell)findViewById(R.id.cell9));
+		mColorCells.add((ColorCell)findViewById(R.id.cell10));
+		mColorCells.add((ColorCell)findViewById(R.id.cell11));
+		mColorCells.add((ColorCell)findViewById(R.id.cell12));
+		mColorCells.add((ColorCell)findViewById(R.id.cell13));
+		mColorCells.add((ColorCell)findViewById(R.id.cell14));
+		mColorCells.add((ColorCell)findViewById(R.id.cell15));
+		mColorCells.add((ColorCell)findViewById(R.id.cell16));
+		for (ColorCell ccCell : mColorCells) {
+			ccCell.setOnClickListener(this);
+		}
 	}
 
 	public ColorPalette(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		LayoutInflater.from(context).inflate(R.layout.colorpalette, this);
 		init();
-		mColor = Color.WHITE;
 	}
 
 	public int getColor() {
 		return mColor;
 	}
-
+	
 	@Override
 	public void onClick(View v) {
 		if (v instanceof ColorCell) {
@@ -66,6 +70,17 @@ public class ColorPalette extends LinearLayout implements OnClickListener {
 	}
 	public static interface OnColorChangedListener{
 		public void onColorChange(int color);
+	}
+	public static interface ColorProvider{
+		public int getCount();
+		public int getColor(int index);
+	}
+	public static final int MAX_COLOR = 16;
+	public void loadColor(ColorProvider provider){
+		for(int i=0;i<provider.getCount();i++){
+			mColorCells.get(i).setColor(provider.getColor(i));
+		}
+		invalidate();
 	}
 
 }

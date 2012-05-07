@@ -1,6 +1,9 @@
 package com.chaos.sleepcry.busecretary.mydraw;
 
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -33,8 +36,8 @@ public class MyPolyLine extends Mydraw {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 	}
-	private void genPatn(PointF[] pts) {
-		if(pts == null) return;
+	public void genPatn(PointF[] pts) {
+		if(pts == null || pts.length <= 2) return;
 		mPath.reset();
 		Rect bound = new Rect(mParent.getLeft(), mParent.getTop(),
 				mParent.getRight(), mParent.getBottom());
@@ -56,13 +59,18 @@ public class MyPolyLine extends Mydraw {
 	public String toString() {
 		return "PolyLine";
 	}
-	
+
 	public void draw(Canvas canvas) {
 		if (mPath == null) {
 			return;
 		}
-		mPaint.setColor(mColor);
+		int flurColor = (mColor&0xffffff)|0x3f000000;
 		mPaint.setStrokeWidth(mLineWidth);
+		mPaint.setColor(flurColor);
+		mPaint.setMaskFilter(mBlur);
+		canvas.drawPath(mPath, mPaint);
+		mPaint.setColor(mColor);
+		mPaint.setMaskFilter(mEmboss);
 		canvas.drawPath(mPath, mPaint);
 	}
 

@@ -2,12 +2,12 @@
 <resources>
 
     <string name="app_name">Drawing TODO</string>
-	<string name="str_date">Date</string>
-	<string name="str_time">Time</string>
-	<string name="str_desc">Description</string>
-	<string name="str_ring">Ring</string>
-	<string name="str_categ">Category</string>
-	<string name="loading_desc">remember your underwear</string>
+    <string name="str_date">Date</string>
+    <string name="str_time">Time</string>
+    <string name="str_desc">Description</string>
+    <string name="str_ring">Ring</string>
+    <string name="str_categ">Category</string>
+    <string name="loading_desc">remember your underwear</string>
     <string name="next">next</string>
     <string name="menuview">view</string>
     <string name="menuundo">undo</string>
@@ -18,7 +18,7 @@
     <string name="ring">choose a ring here</string>
     <string name="sdcardmis">sd card not found</string>
     <string name="deschint">I will ...</string>
-    <string name="elements">elem</string>
+    <string name="menulayer">layer</string>
     <string name="load">load</string>
     <string name="text">text</string>
     <string name="menuelements">elem</string>
@@ -26,15 +26,20 @@
     <string name="temptext">arbitary</string>
     <string name="alert">alert</string>
     <string name="alert_exit_edit">This will combine the image as one and loss the layer information. Are you sure to continue?</string>
-   <string name="loadtitle">Load content from:</string>
-   <string name="autosave">TODO saved succeed! </string>
-   <string name="hour">hour</string>
-   <string name="minute">minute</string>
-   <string name="day">day</string>
-   <string name="month">month</string>
-   <string name="where">where</string>
-   <string name="when">when</string>
-   <string name="what">what</string>
-   <string name="how">how</string>
-   <string name="status">status</string>
+    <string name="loadtitle">Load content from:</string>
+    <string name="autosave">TODO saved succeed! </string>
+    <string name="hour">hour</string>
+    <string name="minute">minute</string>
+    <string name="day">day</string>
+    <string name="month">month</string>
+    <string name="where">where</string>
+    <string name="when">when</string>
+    <string name="what">what</string>
+    <string name="how">how</string>
+    <string name="status">status</string>
+    <string name="menurefresh">refresh</string>
+    <string name="menusetting">settings</string>
+    <string name="menucolor">color</string>
+    <string name="pickcolor">Pick a Color</string>
+
 </resources>
