@@ -10,9 +10,9 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
 
 public class MyDrawable extends Mydraw implements Parcelable {
 	BitmapDrawable mDrawable;
@@ -20,14 +20,14 @@ public class MyDrawable extends Mydraw implements Parcelable {
 	String mUrl = null;
 	static Context msCtxt = null;
 
-	public MyDrawable(BitmapDrawable d, RectF rectf, int layer) {
-		super(layer);
+	public MyDrawable(BitmapDrawable d, RectF rectf, int layer,View parent) {
+		super(layer,parent);
 		mDrawable = d;
 		mDrawPos = rectf;
 	}
 
-	public MyDrawable(String url, RectF rectf, int layer) {
-		super(layer);
+	public MyDrawable(String url, RectF rectf, int layer,View parent) {
+		super(layer,parent);
 		mUrl = url;
 		FileInputStream input = null;
 		try {
@@ -45,6 +45,9 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		}else {
 			return mUrl;
 		}
+	}
+	public void setBounds(RectF pos) {
+		mDrawPos = pos;
 	}
 	public Bitmap getBmp() {
 		return mDrawable!=null?mDrawable.getBitmap():null;
@@ -96,7 +99,7 @@ public class MyDrawable extends Mydraw implements Parcelable {
 			int layer = in.readInt();
 			RectF rectf = new RectF(in.readFloat(), in.readFloat(),
 					in.readFloat(), in.readFloat());
-			return new MyDrawable(url, rectf, layer);
+			return new MyDrawable(url, rectf, layer,null);
 		}
 
 		public MyDrawable[] newArray(int size) {

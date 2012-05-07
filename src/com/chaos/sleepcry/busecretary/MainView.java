@@ -143,7 +143,7 @@ public class MainView extends LinearLayout implements OnClickListener {
 		}
 		if (data.getBmp() == null) {
 			MyDrawable mydraw = new MyDrawable(new BitmapDrawable(
-					data.getBmpPath()), new RectF(0, 0, 1, 1), 0);
+					data.getBmpPath()), new RectF(0, 0, 1, 1), 0,mPb);
 			data.setBmp(mydraw.getBmp());
 			mPb.permenantClear();
 			mPb.add(mydraw);

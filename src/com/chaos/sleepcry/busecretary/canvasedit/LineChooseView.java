@@ -50,7 +50,7 @@ public class LineChooseView extends View {
 		int top = getTop();
 		int height = getBottom() - top;
 		Paint paint = new Paint();
-		paint.setStrokeWidth(mLineWidth);
+		paint.setStrokeWidth((int)Math.sqrt(mLineWidth)+1);
 		paint.setColor(mColor);
 		canvas.drawLine(getLeft(), top + height / 3, getRight(), top + height
 				/ 3, paint);
