@@ -253,7 +253,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 				mdpv = new DatePickerView(this,cal!=null?cal.getTimeInMillis():System.currentTimeMillis());
 				new AlertDialog.Builder(this)
 						.setView(mdpv)
-						.setPositiveButton(R.string.ok,
+						.setPositiveButton(android.R.string.ok,
 								new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog,

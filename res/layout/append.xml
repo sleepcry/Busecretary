@@ -7,7 +7,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/title"
+        android:hint="@string/deschint"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:singleLine="true"
@@ -16,7 +16,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/title"
         android:layout_weight="1.0" >
         <com.chaos.sleepcry.busecretary.mydraw.PaintBoard
             android:id="@+id/canvas"

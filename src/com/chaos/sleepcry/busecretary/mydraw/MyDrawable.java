@@ -20,13 +20,13 @@ public class MyDrawable extends Mydraw implements Parcelable {
 	String mUrl = null;
 	static Context msCtxt = null;
 
-	public MyDrawable(BitmapDrawable d, RectF rectf, int layer,View parent) {
+	public MyDrawable(BitmapDrawable d, RectF rectf, int layer,PaintBoard parent) {
 		super(layer,parent);
 		mDrawable = d;
 		mDrawPos = rectf;
 	}
 
-	public MyDrawable(String url, RectF rectf, int layer,View parent) {
+	public MyDrawable(String url, RectF rectf, int layer,PaintBoard parent) {
 		super(layer,parent);
 		mUrl = url;
 		FileInputStream input = null;

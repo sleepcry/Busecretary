@@ -8,7 +8,6 @@
 	<string name="str_ring">Ring</string>
 	<string name="str_categ">Category</string>
 	<string name="loading_desc">remember your underwear</string>
-    <string name="title">I will ... </string>
     <string name="next">next</string>
     <string name="menuview">view</string>
     <string name="menuundo">undo</string>
@@ -16,9 +15,7 @@
     <string name="menuclear">clear</string>
     <string name="menuexit">exit</string>
     <string name="menuedit">edit</string>
-    <string name="ok">ok</string>
-    <string name="cancel">cancel</string>
-    <string name="ring">choose a ring here...</string>
+    <string name="ring">choose a ring here</string>
     <string name="sdcardmis">sd card not found</string>
     <string name="deschint">I will ...</string>
     <string name="elements">elem</string>
@@ -26,7 +23,7 @@
     <string name="text">text</string>
     <string name="menuelements">elem</string>
     <string name="menushare">share</string>
-    <string name="temptext">type enter after input</string>
+    <string name="temptext">arbitary</string>
     <string name="alert">alert</string>
     <string name="alert_exit_edit">This will combine the image as one and loss the layer information. Are you sure to continue?</string>
    <string name="loadtitle">Load content from:</string>
@@ -39,4 +36,5 @@
    <string name="when">when</string>
    <string name="what">what</string>
    <string name="how">how</string>
+   <string name="status">status</string>
 </resources>

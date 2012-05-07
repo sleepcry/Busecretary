@@ -8,38 +8,47 @@ import android.view.View;
 public abstract class Mydraw implements Comparable<Mydraw> {
 	// used to compare
 	int mLayer;
-	View mParent = null;
+	PaintBoard mParent = null;
 	boolean bVisiable = true;
-	public Mydraw(int layer,View parent){
+
+	public Mydraw(int layer, PaintBoard parent) {
 		mLayer = layer;
 		mParent = parent;
 	}
+
 	public abstract void draw(Canvas canvas);
-	public void setLayer(int layer){
+
+	public void setLayer(int layer) {
 		mLayer = layer;
-	}
-	public int getLayer(){
-		return mLayer;
-	}
-	@Override
-	public int compareTo(Mydraw another) {
-		if (mLayer > another.mLayer) {
-			return 1;
-		} else if (mLayer < another.mLayer) {
-			return -1;
-		} else {
-			return 0;
+		if (mParent != null) {
+			mParent.invalidateAll();
 		}
 	}
-	public void setView(View parent){
+
+	public int getLayer() {
+		return mLayer;
+	}
+
+	@Override
+	public int compareTo(Mydraw another) {
+		return mLayer - another.mLayer;
+	}
+
+	public void setView(PaintBoard parent) {
 		mParent = parent;
 	}
-	public boolean isVisible(){
+
+	public boolean isVisible() {
 		return bVisiable;
 	}
-	public void setVisible(boolean val){
+
+	public void setVisible(boolean val) {
 		bVisiable = val;
+		if (mParent != null) {
+			mParent.invalidateAll();
+		}
 	}
+
 	public PointF getAbsFromRel(PointF ptf) {
 		Rect bound = new Rect(mParent.getLeft(), mParent.getTop(),
 				mParent.getRight(), mParent.getBottom());

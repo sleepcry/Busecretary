@@ -24,6 +24,7 @@
         <item>contact</item>
         <item>camera</item>
         <item>image</item>
+        <item>text</item>
     </string-array>
 
 </resources>

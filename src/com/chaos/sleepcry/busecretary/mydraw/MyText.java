@@ -16,7 +16,7 @@ public class MyText extends Mydraw {
 	Paint mPathPaint;
 	int mTextSize = 0;
 
-	public MyText(String text, PointF pt, int c, int layer,int textsize, View parent) {
+	public MyText(String text, PointF pt, int c, int layer,int textsize, PaintBoard parent) {
 		super(layer, parent);
 		mText = text;
 		mDrawPos = pt;

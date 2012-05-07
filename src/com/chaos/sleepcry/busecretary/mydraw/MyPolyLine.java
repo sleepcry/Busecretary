@@ -17,7 +17,7 @@ public class MyPolyLine extends Mydraw {
 		genPaint();
 	}
 
-	public MyPolyLine(PointF[] pts, int c, int layer, int lineWidt,View parent) {
+	public MyPolyLine(PointF[] pts, int c, int layer, int lineWidt,PaintBoard parent) {
 		super(layer,parent);
 		mColor = c;
 		mLineWidth = lineWidt;

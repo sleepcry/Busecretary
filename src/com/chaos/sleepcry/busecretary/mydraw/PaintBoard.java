@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import utils.LOG;
@@ -108,8 +110,6 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 	public void clearTemp() {
 		mTempCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-//		mTempBitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
-//		mTempCanvas = new Canvas(mTempBitmap);
 	}
 	public void drawTemp() {
 		if (mTempDraw != null && bDrawTemp) {
@@ -123,11 +123,10 @@ public class PaintBoard extends View implements OnTouchListener {
 		bDrawTemp = false;
 		mTempCanvas.drawColor(0);
 		add(mTempDraw);
-//		mTempCanvas = null;
-//		mTempBitmap = null;
 	}
 	public void invalidateAll() {
 		mCanvas.drawColor(Color.BLACK);
+		Collections.sort(mDrawList);
 		for (int i = 0; i < mDrawList.size(); i++) {
 			Mydraw mydraw = mDrawList.get(i);
 			if (mydraw.isVisible()) {
