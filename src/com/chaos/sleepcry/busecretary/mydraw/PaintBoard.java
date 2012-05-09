@@ -416,7 +416,6 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 
 	public boolean canRedo() {
-		LOG.D("paintboard", "flag:"+mCurOp.mFlag);
 		if (mCurOp != null && mCurOp.canRedo()) {
 			return true;
 		}
@@ -431,7 +430,6 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 
 	public boolean canUndo() {
-		LOG.D("paintboard", "flag:"+mCurOp.mFlag);
 		if (mCurOp != null && mCurOp.canUndo()) {
 			return true;
 		}

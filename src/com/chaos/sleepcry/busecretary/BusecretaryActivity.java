@@ -1,12 +1,14 @@
 package com.chaos.sleepcry.busecretary;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import utils.LOG;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -15,6 +17,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -116,6 +121,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		mTitleDesc = (TextView) this.findViewById(R.id.tv_title);
 		mDB = new NotifyDatabase(this, DB_VER);
 		mLstNotis = mDB.query(System.currentTimeMillis());
+		Collections.sort(mLstNotis);
+		mGeocoder = new Geocoder(this, Locale.getDefault());
 		/*
 		 * if the list has not been built if gotten nothing from the
 		 * database,the first time run this program,for example.
@@ -181,12 +188,12 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 							mode = COMMIT_PREVIOUS;
 						}
 					} else if (mTotalOffset > 0
-							&& mTotalOffset > Math.min(mWidthPixel / 2,150)) {
+							&& mTotalOffset > Math.min(mWidthPixel / 2, 150)) {
 						// move to next
 						movePrevious();
 						mode = COMMIT_PREVIOUS;
 					} else if (mTotalOffset < 0
-							&& mTotalOffset < -Math.min(mWidthPixel / 2,150)) {
+							&& mTotalOffset < -Math.min(mWidthPixel / 2, 150)) {
 						// move to previous
 						moveNext();
 						mode = COMMIT_NEXT;
@@ -204,7 +211,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 							&& motion.getX() - mPosDown.x > 0) {
 						break;
 					}
-					//don't move to next if this is the last
+					// don't move to next if this is the last
 					if (mCurNoti.getLocation() == mLstNotis.size()
 							&& motion.getX() - mPosDown.x < 0) {
 						break;
@@ -254,8 +261,10 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			switch (id) {
 			// when
 			case OperationAdapter.WHEN:
-				Calendar cal = mCurNoti.getDay().getCalendar();
-				mdpv = new DatePickerView(this,cal!=null?cal.getTimeInMillis():System.currentTimeMillis());
+				Calendar cal = mCurNoti.getWhen().getCalendar();
+				mdpv = new DatePickerView(this,
+						cal != null ? cal.getTimeInMillis()
+								: System.currentTimeMillis());
 				new AlertDialog.Builder(this)
 						.setView(mdpv)
 						.setPositiveButton(android.R.string.ok,
@@ -265,7 +274,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 											int which) {
 										Calendar cal = Calendar.getInstance();
 										cal.setTimeInMillis(mdpv.getTime());
-										mCurNoti.getDay().setCalendar(cal);
+										mCurNoti.getWhen().setCalendar(cal);
 										updateUI();
 
 									}
@@ -274,15 +283,21 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 				break;
 			// where
 			case OperationAdapter.WHERE:
+				Intent whereIntent = new Intent();
+				whereIntent.setAction(Intent.ACTION_GET_CONTENT);
+				whereIntent.addCategory(Intent.CATEGORY_DEFAULT);
+				whereIntent.addCategory(Intent.CATEGORY_OPENABLE);
+				whereIntent.setData(Uri.parse("geo://weiz.mobi/"));
+				startActivityForResult(whereIntent, OperationAdapter.WHERE);
 				break;
 			// ring
-			case OperationAdapter.RING:
+			case OperationAdapter.NOTIFICATION:
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.addCategory(Intent.CATEGORY_DEFAULT);
 				intent.addCategory(Intent.CATEGORY_OPENABLE);
 				intent.setType("audio/*");
-				this.startActivityForResult(intent, 0);
+				this.startActivityForResult(intent, OperationAdapter.NOTIFICATION);
 				break;
 			// repeat
 			case OperationAdapter.REPEAT:
@@ -291,13 +306,13 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 								new ArrayAdapter<String>(
 										this,
 										android.R.layout.select_dialog_singlechoice,
-										mCurNoti.getCategory().toList()), 0,
+										mCurNoti.getRepeatCategory().toList()), 0,
 								new DialogInterface.OnClickListener() {
 
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										mCurNoti.setCategory(RepeatCategory
+										mCurNoti.setRepeatCategory(RepeatCategory
 												.getInstance(which + 1));
 										updateUI();
 
@@ -306,16 +321,13 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 				dlg2.show();
 				break;
 			// desc
-			case OperationAdapter.DESC:
+			case OperationAdapter.WHAT:
 				break;
 			// weather
 			case OperationAdapter.WEATHER:
 				break;
 			// about
-			case OperationAdapter.ABOUT:
-				break;
-			// configure
-			case OperationAdapter.CONFIGURE:
+			case OperationAdapter.SEARCH:
 				break;
 			}
 		}
@@ -328,8 +340,8 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 
 		// process the current notification
 		if (mCurNoti != null && mLstNotis.indexOf(mCurNoti) == -1) {
-			mCurNoti.setDesc(mCur.getDesc());
-			if (mCurNoti.getDay().getCalendar().getTimeInMillis() <= System
+//			mCurNoti.setWhat(mCur.getDesc());
+			if (mCurNoti.getWhen().getCalendar().getTimeInMillis() <= System
 					.currentTimeMillis()) {
 				Toast.makeText(this, "the time is in the past!",
 						Toast.LENGTH_SHORT).show();
@@ -340,7 +352,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(BusecretaryActivity.this,
 					NotifyReceiver.class);
 			Bundle bundle = new Bundle();
-			bundle.putString(NotifyDatabase.DESC, mCurNoti.getDesc());
+			bundle.putString(NotifyDatabase.DESC, mCurNoti.getWhat());
 			bundle.putString(NotifyDatabase.RING, mCurNoti.getRing());
 			intent.putExtras(bundle);
 			PendingIntent pIntent = PendingIntent.getBroadcast(this,
@@ -352,14 +364,14 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			// the time interval the alarm will be launched
 			long interval = 0;
 			// the time when to start the alarm
-			long triggerTime = mCurNoti.getDay().getCalendar()
+			long triggerTime = mCurNoti.getWhen().getCalendar()
 					.getTimeInMillis();
 
 			if (triggerTime > System.currentTimeMillis()) {
 				boolean bRepeat = true;
 				Calendar cal = Calendar.getInstance();
 				cal.setTimeInMillis(triggerTime);
-				switch (mCurNoti.getCategory()) {
+				switch (mCurNoti.getRepeatCategory()) {
 				case EVERYDAY:
 					cal.add(Calendar.DATE, 1);
 					interval = cal.getTimeInMillis() - triggerTime;
@@ -394,9 +406,9 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			/*
 			 * save the current notification
 			 */
-			mDB.insert(mCurNoti.getId(), mCurNoti.getDay().getCalendar()
-					.getTimeInMillis(), mCurNoti.getDesc(), mCurNoti.getRing(),
-					mCurNoti.getCategory().getId(), null);
+			mDB.insert(mCurNoti.getId(), mCurNoti.getWhen().getCalendar()
+					.getTimeInMillis(), mCurNoti.getWhat(), mCurNoti.getRing(),
+					mCurNoti.getRepeatCategory().getId(), null);
 			// synchronize the list
 			mLstNotis.add(mCurNoti.getLocation(), mCurNoti);
 		}
@@ -405,7 +417,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(BusecretaryActivity.this,
 					NotifyActivity.class);
 			Bundle bundle = new Bundle();
-			bundle.putString(NotifyDatabase.DESC, data.getDesc());
+			bundle.putString(NotifyDatabase.DESC, data.getWhat());
 			bundle.putString(NotifyDatabase.RING, data.getRing());
 			intent.putExtras(bundle);
 			PendingIntent pIntent = PendingIntent.getActivity(
@@ -421,19 +433,22 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		// move to the specified data
 		if (data != null) {
 			mCurNoti = data;
-			mCur.setDesc(mCurNoti.getDesc());
+//			mCur.setWhat(mCurNoti.getWhat());
 		}
 	}
 
 	public void onDestroy() {
 		super.onDestroy();
 		switchNotif(null);
-		for(int i=0;i<mLstNotis.size();i++) {
+		for (int i = 0; i < mLstNotis.size(); i++) {
 			mLstNotis.get(i).setBmp(null);
 		}
 		mCurNoti.setBmp(null);
 		System.gc();
 	}
+
+	private Geocoder mGeocoder = null;
+	private Address mAddress = null;
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -441,10 +456,42 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			return;
 		}
 		switch (requestCode) {
-		case 0: // retrieve music
+		// TODO:
+		case OperationAdapter.NOTIFICATION: // retrieve music
 			mCurNoti.setRing(data.getDataString());
 			updateUI();
 			break;
+		case OperationAdapter.WHERE:
+			if (data != null && data.getExtras() != null && data.getExtras().containsKey("data")) {
+				String geoData = data.getStringExtra("data");
+				if(geoData == null)break;
+				String[] lonlat = geoData.split(",");
+				if(lonlat.length < 2)break;
+				double latitude = Double.parseDouble(lonlat[0]);
+				double longitude = Double.parseDouble(lonlat[1]);
+				List<Address> addresses = null;
+				String whereString = "";
+				try {
+					addresses = mGeocoder.getFromLocation(latitude, longitude,1);
+					if (addresses != null && addresses.size() > 0) {
+						mAddress = addresses.get(0);
+						
+						for(int i=0;i<=mAddress.getMaxAddressLineIndex();i++) {
+							whereString +=  mAddress.getAddressLine(i);
+						}
+						mCurNoti.setWhere(whereString);
+						updateUI();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					whereString = geoData;
+				}
+				mCurNoti.setWhere(whereString);
+				updateUI();
+			}
+			break;
+
 		}
 	}
 
@@ -465,7 +512,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		int loc = data.getLocation() + 1;
 		mPbPregress.setProgress(loc);
 		mPbPregress.setMax(total);
-		mTitleDesc.setText(data.getDesc() + " " + loc + "/" + total);
+		mTitleDesc.setText(data.getWhat() + " " + loc + "/" + total);
 		mCur.notifyUI(data);
 		mPrevious.notifyUI(pre);
 		mNext.notifyUI(next);
@@ -495,19 +542,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 				NotificationData data = mLstNotis.get(mCurNoti.getLocation());
 				switchNotif(data);
 			}
-			// if this is the last one
-//			else {
-//				int maxId = 0;
-//				if (mLstNotis.size() >= 1) {
-//					maxId = mLstNotis.get(mLstNotis.size() - 1).getId();
-//				}
-//				if (mCurNoti.getId() > maxId) {
-//					maxId = mCurNoti.getId();
-//				}
-//				NotificationData data = new NotificationData(maxId + 1,
-//						mLstNotis.size() + 1);
-//				switchNotif(data);
-//			}
 		}
 		return true;
 	}
@@ -581,7 +615,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case COMMIT_PREVIOUS:
-			if(pre != null) {
+			if (pre != null) {
 				pre.setBmp(null);
 			}
 			break;

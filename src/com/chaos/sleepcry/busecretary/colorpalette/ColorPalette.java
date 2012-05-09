@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.R.integer;
 import android.content.Context;
 import android.graphics.Color;
+import android.telephony.CellLocation;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,14 +55,35 @@ public class ColorPalette extends LinearLayout implements OnClickListener {
 	public int getColor() {
 		return mColor;
 	}
-	
+	private ColorCell mCurCell = null;
+	public void changeColor(int newColor) {
+		for (ColorCell ccCell : mColorCells) {
+			if(ccCell.getColor() == newColor) {
+				changeCell(ccCell);
+				break;
+			}
+		}
+	}
+	public void changeCell(ColorCell cell) {
+		if(mCurCell != null) {
+			mCurCell.select(false);
+			mCurCell.invalidate();
+		}
+		mCurCell = cell;
+		if(mCurCell != null) {
+			mCurCell.select(true);
+			mCurCell.invalidate();
+		}
+	}
 	@Override
 	public void onClick(View v) {
-		if (v instanceof ColorCell) {
-			mColor = ((ColorCell) v).getColor();
+		if (v instanceof ColorCell) {			
+			ColorCell cell = (ColorCell) v;
+			mColor = cell.getColor();
 			if(mColorChangedListener != null){
 				mColorChangedListener.onColorChange(mColor);
 			}
+			
 		}
 
 	}

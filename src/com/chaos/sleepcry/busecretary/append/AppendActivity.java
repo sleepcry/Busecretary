@@ -3,6 +3,7 @@ package com.chaos.sleepcry.busecretary.append;
 import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -73,14 +74,22 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	}
 
 	public void ok(View v) {
+		String desc = mTitle.getText().toString();
+		if(desc == null || desc.length() == 0) {
+			new AlertDialog.Builder(this)
+			.setTitle(android.R.string.untitled)
+			.setIcon(android.R.drawable.ic_dialog_alert)
+			.setMessage(R.string.titleUnspecified)
+			.setPositiveButton(android.R.string.ok, null).show();
+			return;
+		}
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(System.currentTimeMillis());
 		cal.add(Calendar.DATE, 1);
-		String desc = mTitle.getText().toString();
 		NotificationData data = new NotificationData();
 		NotifyDatabase db = new NotifyDatabase(this, BusecretaryActivity.DB_VER);
 		db.insert(db.getMaxId() + 1, cal.getTimeInMillis(), desc,
-				data.getRing(), data.getCategory().getId(), mPb.toBitmap());
+				data.getRing(), data.getRepeatCategory().getId(), mPb.toBitmap());
 		Toast.makeText(this, getString(R.string.autosave), Toast.LENGTH_SHORT)
 				.show();
 		mTitle.setText("");

@@ -39,7 +39,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 				db.setCurRcd(id);
 				Log.d("widget","set id into:" + id);
 				BSRemoteView view = new BSRemoteView(c, id);
-				view.setTextViewText(R.id.tv_widget_content,data.getDesc());
+				view.setTextViewText(R.id.tv_widget_content,data.getWhat());
 				AppWidgetManager appWidgetManager = AppWidgetManager
 						.getInstance(c);
 				int[] ids = appWidgetManager.getAppWidgetIds(new ComponentName(

@@ -147,10 +147,10 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			NotificationData n = new NotificationData();
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(c.getLong(c.getColumnIndex(DAY)));
-			n.setDay(new Day(cal));
-			n.setDesc(c.getString(c.getColumnIndex(DESC)));
+			n.setWhen(new Day(cal));
+			n.setWhat(c.getString(c.getColumnIndex(DESC)));
 			n.setRing(c.getString(c.getColumnIndex(RING)));
-			n.setCategory(RepeatCategory.getInstance(c.getInt(c
+			n.setRepeatCategory(RepeatCategory.getInstance(c.getInt(c
 					.getColumnIndex(CATEGORY))));
 			// update the mId according to the records from the database
 			n.setId(c.getInt(c.getColumnIndex(ID)));
@@ -176,10 +176,10 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		NotificationData n = new NotificationData();
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(c.getLong(c.getColumnIndex(DAY)));
-		n.setDay(new Day(cal));
-		n.setDesc(c.getString(c.getColumnIndex(DESC)));
+		n.setWhen(new Day(cal));
+		n.setWhat(c.getString(c.getColumnIndex(DESC)));
 		n.setRing(c.getString(c.getColumnIndex(RING)));
-		n.setCategory(RepeatCategory.getInstance(c.getInt(c
+		n.setRepeatCategory(RepeatCategory.getInstance(c.getInt(c
 				.getColumnIndex(CATEGORY))));
 		// update the mId according to the records from the database
 		n.setId(c.getInt(c.getColumnIndex(ID)));

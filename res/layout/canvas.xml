@@ -89,6 +89,7 @@
             android:layout_height="match_parent"
             android:onClick="load"
             android:text="@string/load"
+            android:background="@drawable/button"
             android:textSize="20dp" />
     </LinearLayout>
 

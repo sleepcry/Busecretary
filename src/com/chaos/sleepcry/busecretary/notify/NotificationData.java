@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import com.chaos.sleepcry.busecretary.Day;
 import com.chaos.sleepcry.busecretary.RepeatCategory;
 
-public class NotificationData {
+public class NotificationData implements Comparable<NotificationData> {
 	private int mId;
 	private Day mDay;
 	private String mDesc;
@@ -33,8 +33,8 @@ public class NotificationData {
 		mBmpPath = null;
 	}
 
-	/*@{
-	 * getter & setter
+	/*
+	 * @{ getter & setter
 	 */
 	public void setLocation(int mLocation) {
 		this.mLocation = mLocation;
@@ -44,11 +44,11 @@ public class NotificationData {
 		return mLocation;
 	}
 
-	public void setCategory(RepeatCategory mCategory) {
+	public void setRepeatCategory(RepeatCategory mCategory) {
 		this.mCategory = mCategory;
 	}
 
-	public RepeatCategory getCategory() {
+	public RepeatCategory getRepeatCategory() {
 		return mCategory;
 	}
 
@@ -60,42 +60,59 @@ public class NotificationData {
 		return mRing;
 	}
 
-	public void setDesc(String mDesc) {
+	public void setWhat(String mDesc) {
 		this.mDesc = mDesc;
 	}
 
-	public String getDesc() {
+	public String getWhat() {
 		return mDesc;
 	}
 
-	public void setDay(Day mDay) {
+	public void setWhen(Day mDay) {
 		this.mDay = mDay;
 	}
 
-	public Day getDay() {
+	public Day getWhen() {
 		return mDay;
 	}
 
 	public void setId(int mId) {
 		this.mId = mId;
 	}
+	private String mWhereString = null;
+	public void setWhere(String where) {
+		mWhereString = where;
+	}
+	public String getWhere() {
+		return mWhereString;
+	}
 
 	public int getId() {
 		return mId;
 	}
-	public String getBmpPath(){
+
+	public String getBmpPath() {
 		return mBmpPath;
 	}
-	public void setBmpPath(String bmp){
+
+	public void setBmpPath(String bmp) {
 		this.mBmpPath = bmp;
 	}
+
 	public Bitmap getBmp() {
 		return mBitMap;
 	}
+
 	public void setBmp(Bitmap bmp) {
-		if(mBitMap != null) {
+		if (mBitMap != null) {
 			mBitMap.recycle();
 		}
 		mBitMap = bmp;
+	}
+
+	@Override
+	public int compareTo(NotificationData another) {
+		return (int) (another.mDay.getCalendar().getTimeInMillis() - mDay
+				.getCalendar().getTimeInMillis());
 	}
 }

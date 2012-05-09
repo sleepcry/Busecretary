@@ -811,6 +811,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		mTempView.setTextColor(color);
 		mTempText.setTextColor(color);
 		mTempText.setBackgroundColor((~color) | 0xff101010);
+		mColorPal.changeColor(color);
 	}
 
     ArrayList<ColorItem> mPreferColors = new ArrayList<ColorItem>();

@@ -64,4 +64,8 @@
     <string name="target">target</string>
 	<string name="reset">reset</string>
 	<string name="colorhint">8 digits color</string>
+	<string name="titleUnspecified">Please describe the TODO first</string>
+	<string name="more"><strong>more</strong>...</string>
+	<string name="search">search</string>
+	<string name="weather">weather</string>
 </resources>

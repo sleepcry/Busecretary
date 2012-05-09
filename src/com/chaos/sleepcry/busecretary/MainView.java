@@ -13,6 +13,9 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,8 +54,9 @@ public class MainView extends LinearLayout implements OnClickListener {
 		mPb = (PaintBoard) findViewById(R.id.mainsurface);
 		mPb.setEditable(false);
 		mAdapter = new OperationAdapter(context);
-		Button btn = (Button) LayoutInflater.from(context).inflate(R.layout.normalbtn, null);
-		btn.setText("more...");
+		Button btn = (Button) LayoutInflater.from(context).inflate(
+				R.layout.normalbtn, null);
+		btn.setText(R.string.more);
 		btn.setOnClickListener(this);
 		mList.addFooterView(btn);
 		mList.setAdapter(mAdapter);
@@ -62,10 +66,12 @@ public class MainView extends LinearLayout implements OnClickListener {
 		 */
 		mAnimation = new PaneAnimation(0);
 	}
-	public void setData(NotificationData data){
+
+	public void setData(NotificationData data) {
 		mAdapter.setData(data);
-		mList.invalidateViews();
+		mAdapter.notifyDataSetChanged();
 	}
+
 	public PaintBoard getPaintBoard() {
 		return mPb;
 	}
@@ -88,23 +94,30 @@ public class MainView extends LinearLayout implements OnClickListener {
 		startAnimation(anim);
 	}
 
-	public String getDesc() {
-		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.DESC);
-		if (mBtnDesc == null) {
-			return null;
-		}
-		return mBtnDesc.getText().toString();
-	}
+//	public String getDesc() {
+//		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.WHAT);
+//		if (mBtnDesc == null) {
+//			return null;
+//		}
+//		return mBtnDesc.getText().toString();
+//	}
 
-	public void setDesc(String desc) {
-		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.DESC);
+	private void setWhat(CharSequence desc) {
+		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.WHAT);
 		if (mBtnDesc != null) {
 			mBtnDesc.setText(desc);
 		}
 	}
 
+	private void setWhere(CharSequence where) {
+		Button mBtnWhere = (Button) this.findViewById(OperationAdapter.WHERE);
+		if (mBtnWhere != null) {
+			mBtnWhere.setText(where);
+		}
+	}
+
 	public void reset() {
-		setDesc("");
+//		setWhat("");
 		mAdapter.reset();
 		mList.invalidateViews();
 	}
@@ -113,15 +126,27 @@ public class MainView extends LinearLayout implements OnClickListener {
 		if (data == null) {
 			return;
 		}
-		Button mBtnDateDesc = (Button) mList.findViewById(OperationAdapter.WHEN);
-		Button mBtnRingDesc = (Button) this.findViewById(OperationAdapter.RING);
-		Button mBtnRepeatDesc = (Button) this
-				.findViewById(OperationAdapter.REPEAT);
-		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.DESC);
+		final String str1 = OperationAdapter.str1;
+		final String str2 = OperationAdapter.str2;
+		// when
+		Button mBtnDateDesc = (Button) mList
+				.findViewById(OperationAdapter.WHEN);
 		if (mBtnDateDesc != null) {
-			mBtnDateDesc.setText(data.getDay().getString());
+			mBtnDateDesc.setText(Html.fromHtml(str1
+					+ mMainFrm.getString(R.string.when) + str2
+					+ data.getWhen().getString()));
 		}
-		// mBtnTimeDesc.setText(data.getDay().getTimeString());
+		// where
+		setWhere(Html.fromHtml(str1 + mMainFrm.getString(R.string.where) + str2
+				+ data.getWhere()));
+		// what
+		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.WHAT);
+		if (mBtnDesc != null) {
+			setWhat(Html.fromHtml(str1 + mMainFrm.getString(R.string.what)
+					+ str2 + data.getWhat()));
+		}
+		// notification
+		Button mBtnRingDesc = (Button) findViewById(OperationAdapter.NOTIFICATION);
 		if (mBtnRingDesc != null) {
 			if (data.getRing() != null) {
 				Uri ring = Uri.parse(data.getRing());
@@ -137,33 +162,43 @@ public class MainView extends LinearLayout implements OnClickListener {
 				mBtnRingDesc.setText("choose a ring here...");
 			}
 		}
-		if (mBtnDesc != null) {
-			String text = getDesc();
-			if (text.equals("")) {
-				text = data.getDesc();
-			}
-			setDesc(text);
+		// weather?
+		Button btnWeatherButton = (Button) findViewById(OperationAdapter.WEATHER);
+		if (btnWeatherButton != null) {
+			btnWeatherButton.setText(Html.fromHtml(str1
+					+ mMainFrm.getString(R.string.weather) + str2
+					+ mMainFrm.getString(android.R.string.unknownName)));
 		}
+		// search?
+		Button btnSearch = (Button) findViewById(OperationAdapter.SEARCH);
+		if (btnSearch != null) {
+			btnSearch.setText(Html.fromHtml(str1
+					+ mMainFrm.getString(R.string.search) + str2
+					+ data.getWhat()));
+		}
+		// notification repeat
+		Button mBtnRepeatDesc = (Button) findViewById(OperationAdapter.REPEAT);
 		if (mBtnRepeatDesc != null) {
-			mBtnRepeatDesc
-					.setText("Category:  " + data.getCategory().getDesc());
+			mBtnRepeatDesc.setText("Category:  "
+					+ data.getRepeatCategory().getDesc());
 		}
+		// image
 		if (data.getBmp() == null) {
 			LOG.D("memory", "bmp path:" + data.getBmpPath());
 			String path = data.getBmpPath();
-			if(path != null && path.length() > 0) {
-			try {
-				System.gc();
+			if (path != null && path.length() > 0) {
+				try {
+					System.gc();
 					File file = new File(data.getBmpPath());
 					FileInputStream fis = new FileInputStream(file);
 					BitmapFactory.Options opts = new BitmapFactory.Options();
 					opts.inJustDecodeBounds = false;
-					opts.inSampleSize=4;
+					opts.inSampleSize = 4;
 					Bitmap bmp = BitmapFactory.decodeStream(fis, null, opts);
 					LOG.D("memory", "bitmap bounds:" + opts.outWidth + ","
 							+ opts.outHeight);
-					MyDrawable mydraw = new MyDrawable(new BitmapDrawable(
-							bmp), new RectF(0, 0, 1, 1), 0,mPb);
+					MyDrawable mydraw = new MyDrawable(new BitmapDrawable(bmp),
+							new RectF(0, 0, 1, 1), 0, mPb);
 					data.setBmp(bmp);
 					mPb.clear();
 					mPb.add(mydraw);
@@ -172,17 +207,19 @@ public class MainView extends LinearLayout implements OnClickListener {
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}catch(IOException ioe) {
-					
+				} catch (IOException ioe) {
+
 				}
-				
+
 			}
 		}
 	}
-	public void collapse(){
+
+	public void collapse() {
 		mAdapter.collapse();
 		mList.invalidateViews();
 	}
+
 	@Override
 	public void onClick(View v) {
 		if (v instanceof Button) {
@@ -213,11 +250,13 @@ public class MainView extends LinearLayout implements OnClickListener {
 
 	public void pause() {
 	}
+
 	public Bitmap getBmp() {
-		if(mPb != null){
-			Mydraw[] draws= mPb.getDrawList();
-			if(draws != null && draws.length > 0 && draws[0] instanceof MyDrawable) {
-				MyDrawable drawable =(MyDrawable)draws[0]; 
+		if (mPb != null) {
+			Mydraw[] draws = mPb.getDrawList();
+			if (draws != null && draws.length > 0
+					&& draws[0] instanceof MyDrawable) {
+				MyDrawable drawable = (MyDrawable) draws[0];
 				return drawable.getBmp();
 			}
 		}

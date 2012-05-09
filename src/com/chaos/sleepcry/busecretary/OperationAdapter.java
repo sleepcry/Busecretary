@@ -3,27 +3,30 @@ package com.chaos.sleepcry.busecretary;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.LOG;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 
-public class OperationAdapter implements ListAdapter {
+public class OperationAdapter extends BaseAdapter {
 
 	public static final int WHEN = 0;
 	public static final int WHERE = 1;
-	public static final int RING = 2;
+	public static final int NOTIFICATION = 2;
 	public static final int REPEAT = 3;
-	public static final int DESC = 4;
-	public static final int ABOUT = 5;
-	public static final int CONFIGURE = 6;
+	public static final int WHAT = 4;
+	public static final int SEARCH = 5;
 	public static final int WEATHER = 7;
 	private int mLayer;
 	NotificationData mData;
@@ -39,20 +42,16 @@ public class OperationAdapter implements ListAdapter {
 		
 		lstAllData = new ArrayList<ArrayList<InfoObj>>();
 		ArrayList<InfoObj> layer0 = new ArrayList<InfoObj>();
-		layer0.add(new InfoObj("when",WHEN));
-		layer0.add(new InfoObj("where",WHERE));
-		layer0.add(new InfoObj("ring",RING));
-		layer0.add(new InfoObj("repeat",REPEAT));
-		layer0.add(new InfoObj("desc",DESC));
+		layer0.add(new InfoObj("when?",WHEN));
+		layer0.add(new InfoObj("where?",WHERE));
+		layer0.add(new InfoObj("what?",WHAT));
 		lstAllData.add(layer0);
 		ArrayList<InfoObj> layer1 = new ArrayList<InfoObj>();
-		layer1.add(new InfoObj("weather",WEATHER));
-		layer1.add(new InfoObj("about the keyword",ABOUT));
+		layer1.add(new InfoObj("notify?",NOTIFICATION));
+		layer1.add(new InfoObj("repeat?",REPEAT));
+		layer1.add(new InfoObj("weather?",WEATHER));
+		layer1.add(new InfoObj("search?",SEARCH));
 		lstAllData.add(layer1);
-		ArrayList<InfoObj> layer2 = new ArrayList<InfoObj>();
-		layer2.add(new InfoObj("configure",CONFIGURE));
-		lstAllData.add(layer2);
-
 	}
 
 	public void setData(NotificationData data) {
@@ -121,12 +120,17 @@ public class OperationAdapter implements ListAdapter {
 		if (mData != null) {
 			switch (lstData.get(position).id) {
 			case WHEN:
-				btn.setText(mData.getDay().getString());
+				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.when)+str2 + mData.getWhen().getString()));
 				break;
 			case WHERE:
-				btn.setText(lstData.get(position).content);
+				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.where)+str2 + mData.getWhere()));
+				LOG.D("where",""+mData.getWhere());
 				break;
-			case RING:
+			case WHAT:
+				btn.setHint(R.string.where);
+				btn.setText(Html.fromHtml(str1 + mCtxt.getString(R.string.what) +str2+ mData.getWhat()));
+				break;
+			case NOTIFICATION:
 				if (mData.getRing() != null) {
 					Uri ring = Uri.parse(mData.getRing());
 					Cursor cursor = mCtxt.getContentResolver().query(ring,
@@ -148,24 +152,17 @@ public class OperationAdapter implements ListAdapter {
 				}
 				break;
 			case REPEAT:
-				btn.setText("" + mData.getCategory().getDesc());
-				break;
-			case DESC:
-				btn.setHint(R.string.deschint);
-				btn.setText(mData.getDesc());
-				break;
+				btn.setText("" + mData.getRepeatCategory().getDesc());
+				break;			
 			case WEATHER:
 				btn.setText(lstData.get(position).content);
 				break;
-			case ABOUT:
-				btn.setText(lstData.get(position).content);
-				break;
-			case CONFIGURE:
-				btn.setText(lstData.get(position).content);
+			case SEARCH:
+				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.search)+str2+mData.getWhat()));
 				break;
 			}
 		} else {
-			btn.setText(lstData.get(position).content);
+			btn.setText(mCtxt.getString(android.R.string.unknownName));
 		}
 		btn.setTextSize(20);
 		btn.setTextColor(Color.WHITE);
@@ -176,6 +173,8 @@ public class OperationAdapter implements ListAdapter {
 		return btn;
 	}
 
+	public static final String str1 = "<span><font color=\"#ff0000\">";
+	public static final String str2 = "?   </font></span>";
 	@Override
 	public int getViewTypeCount() {
 		return 1;

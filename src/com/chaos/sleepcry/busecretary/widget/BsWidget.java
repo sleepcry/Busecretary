@@ -23,7 +23,7 @@ public class BsWidget extends AppWidgetProvider {
 			NotifyDatabase db = new NotifyDatabase(context,BusecretaryActivity.DB_VER);
 			NotificationData data = db.queryone(0);
 			if(null != data){
-				rvs.setTextViewText(R.id.tv_widget_content, data.getDesc());
+				rvs.setTextViewText(R.id.tv_widget_content, data.getWhat());
 			}else{
 				rvs.setTextViewText(R.id.tv_widget_content, "add something here...");
 			}

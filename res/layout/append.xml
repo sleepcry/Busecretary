@@ -3,16 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <EditText
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/deschint"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:singleLine="true"
-        android:textStyle="bold" >
-    </EditText>
+    
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,10 +13,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>
+    <EditText
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/deschint"
+        android:background="@drawable/input"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:shadowColor="@color/red"
+        android:shadowDx="2"
+        android:shadowDy="0"
+        android:singleLine="true"
+        android:textStyle="bold" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/red"
+        android:background="@color/black"
         android:gravity="center"
         android:orientation="horizontal" >
         <ImageButton
