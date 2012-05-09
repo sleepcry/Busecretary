@@ -41,5 +41,27 @@
     <string name="menusetting">settings</string>
     <string name="menucolor">color</string>
     <string name="pickcolor">Pick a Color</string>
-
+    <string name="flur">flur</string>
+    <string name="emboss">emboss</string>
+    <string name="add">add</string>
+    <string name="erase">erase</string>
+    <string name="darken">darken</string>
+    <string name="dst">dst</string>
+    <string name="dst_in">dst_in</string>
+    <string name="dst_atop">dst_atop</string>
+    <string name="dst_out">dst_out</string>
+    <string name="dst_over">dst_over</string>
+    <string name="lighten">lighten</string>
+    <string name="multiply">multiply</string>
+    <string name="screen">screen</string>
+    <string name="src">src</string>
+    <string name="src_in">src in</string>
+    <string name="src_out">src out</string>
+    <string name="src_over">src over</string>
+    <string name="src_atop">src atop</string>
+    <string name="xor">xor</string>
+    <string name="avoid">avoid</string>
+    <string name="target">target</string>
+	<string name="reset">reset</string>
+	<string name="colorhint">8 digits color</string>
 </resources>

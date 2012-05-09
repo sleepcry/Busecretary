@@ -12,7 +12,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.view.View;
 
 public class MyDrawable extends Mydraw implements Parcelable {
 	BitmapDrawable mDrawable;
@@ -26,7 +25,7 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		mDrawPos = rectf;
 	}
 
-	public MyDrawable(String url, RectF rectf, int layer,PaintBoard parent) {
+	public MyDrawable(String url, int layer,PaintBoard parent) {
 		super(layer,parent);
 		mUrl = url;
 		FileInputStream input = null;
@@ -36,7 +35,7 @@ public class MyDrawable extends Mydraw implements Parcelable {
 			e1.printStackTrace();
 		}
 		mDrawable = new BitmapDrawable(BitmapFactory.decodeStream(input));
-		mDrawPos = rectf;
+		mDrawPos = new RectF(0,0,1,1);
 	}
 	
 	public String toString(){
@@ -63,8 +62,7 @@ public class MyDrawable extends Mydraw implements Parcelable {
 	@Override
 	public void draw(Canvas canvas) {
 		Rect rect = new Rect();
-		Rect bound = new Rect(mParent.getLeft(), mParent.getTop(),
-				mParent.getRight(), mParent.getBottom());
+		Rect bound = getBounds();
 		rect.left = (int) (bound.left + bound.width() * mDrawPos.left);
 		rect.right = (int) (bound.left + bound.width() * mDrawPos.right);
 		rect.top = (int) (bound.top + bound.height() * mDrawPos.top);
@@ -85,10 +83,10 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		if (mDrawable instanceof BitmapDrawable) {
 			dest.writeString(mUrl);
 			dest.writeInt(mLayer);
-			dest.writeFloat(mDrawPos.left);
-			dest.writeFloat(mDrawPos.top);
-			dest.writeFloat(mDrawPos.right);
-			dest.writeFloat(mDrawPos.bottom);
+//			dest.writeFloat(mDrawPos.left);
+//			dest.writeFloat(mDrawPos.top);
+//			dest.writeFloat(mDrawPos.right);
+//			dest.writeFloat(mDrawPos.bottom);
 		}
 
 	}
@@ -97,9 +95,9 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		public MyDrawable createFromParcel(Parcel in) {
 			String url = in.readString();
 			int layer = in.readInt();
-			RectF rectf = new RectF(in.readFloat(), in.readFloat(),
-					in.readFloat(), in.readFloat());
-			return new MyDrawable(url, rectf, layer,null);
+//			RectF rectf = new RectF(in.readFloat(), in.readFloat(),
+//					in.readFloat(), in.readFloat());
+			return new MyDrawable(url, layer,null);
 		}
 
 		public MyDrawable[] newArray(int size) {

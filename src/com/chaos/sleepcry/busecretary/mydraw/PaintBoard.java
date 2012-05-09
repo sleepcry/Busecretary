@@ -21,6 +21,7 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class PaintBoard extends View implements OnTouchListener {
 	boolean bEditable;
 	Context mContext = null;
 	Paint mPaint = null;
+	int mLineFlag = 0;
 	Bitmap mBitmap, mTempBitmap;
 	Canvas mCanvas, mTempCanvas;
 	ArrayList<Mydraw> undraw = new ArrayList<Mydraw>();
@@ -69,17 +71,27 @@ public class PaintBoard extends View implements OnTouchListener {
 
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+//		LOG.logMem(mContext);
 		Bitmap temp = mBitmap;
 		Bitmap temptemp = mTempBitmap;
-		mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		mBitmap = Bitmap.createBitmap((int) (w * Mydraw.DIV),
+				(int) (h * Mydraw.DIV), Bitmap.Config.ARGB_8888);
 		mCanvas = new Canvas(mBitmap);
 		if (temp != null) {
-			mCanvas.drawBitmap(temp, 0, 0, mPaint);
+			mCanvas.drawBitmap(temp,
+					new Rect(0, 0, temp.getWidth(), temp.getHeight()),
+					new Rect(0, 0, w, h), mPaint);
+			// mCanvas.drawBitmap(temp, 0, 0, mPaint);
+			temp.recycle();
 		}
-		mTempBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		mTempBitmap = Bitmap.createBitmap((int) (w * Mydraw.DIV),
+				(int) (h * Mydraw.DIV), Bitmap.Config.ARGB_8888);
 		mTempCanvas = new Canvas(mTempBitmap);
 		if (temptemp != null) {
-			mTempCanvas.drawBitmap(temptemp, 0, 0, mPaint);
+			mTempCanvas.drawBitmap(temptemp, new Rect(0, 0,
+					temptemp.getWidth(), temptemp.getHeight()), new Rect(0, 0,
+					w, h), mPaint);
+			temptemp.recycle();
 		}
 	}
 
@@ -90,7 +102,7 @@ public class PaintBoard extends View implements OnTouchListener {
 	public void drawMyDraw(Mydraw mydraw) {
 		if (mCanvas == null && mydraw != null) {
 			undraw.add(mydraw);
-		} else {
+		} else if (mCanvas != null) {
 			for (int i = 0; i < undraw.size(); i++) {
 				undraw.get(i).draw(mCanvas);
 			}
@@ -100,35 +112,49 @@ public class PaintBoard extends View implements OnTouchListener {
 			}
 		}
 	}
+
 	private boolean bDrawTemp = false;
 	private Mydraw mTempDraw;
+
 	public void startDrawTemp(Mydraw mydraw) {
 		clearTemp();
 		mTempDraw = mydraw;
 		bDrawTemp = true;
 	}
+
 	public void clearTemp() {
-		mTempCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+		if (mTempCanvas != null) {
+			mTempCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+		}
 	}
+
 	public void drawTemp() {
-		if (mTempDraw != null && bDrawTemp) {
+		if (mTempDraw != null && bDrawTemp && mTempCanvas != null) {
 			mTempCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
 			mTempDraw.draw(mTempCanvas);
 			invalidate();
 		}
 	}
+
 	public void commitTemp() {
 		bDrawTemp = false;
 		add(mTempDraw);
+		mTempDraw = null;
 	}
-	public void cancelTemp(){
+
+	public void cancelTemp() {
 		bDrawTemp = false;
 		invalidate();
+		mTempDraw = null;
 	}
-	public void postInvalidateAll(){
-		
+
+	public void postInvalidateAll() {
+
 	}
+
 	public void invalidateAll() {
+		if (mCanvas == null || mDrawList == null)
+			return;
 		mCanvas.drawColor(Color.BLACK);
 		Collections.sort(mDrawList);
 		for (int i = 0; i < mDrawList.size(); i++) {
@@ -139,12 +165,22 @@ public class PaintBoard extends View implements OnTouchListener {
 		}
 		invalidate();
 	}
-
+	public void setPaint(int flag) {
+		mLineFlag = flag;
+	}
 	public void onDraw(Canvas canvas) {
 		drawMyDraw(null);
-		canvas.drawBitmap(mBitmap, 0, 0, mPaint);
-		if(bDrawTemp ) {
-			canvas.drawBitmap(mTempBitmap,0,0,mPaint);
+		if (mBitmap != null) {
+			canvas.drawBitmap(mBitmap, new Rect(0, 0, mBitmap.getWidth(),
+					mBitmap.getHeight()), new Rect(0, 0, getWidth(),
+					getHeight()), mPaint);
+		}
+		if (bDrawTemp && mTempBitmap != null) {
+			canvas.drawBitmap(
+					mTempBitmap,
+					new Rect(0, 0, mTempBitmap.getWidth(), mTempBitmap
+							.getHeight()), new Rect(0, 0, getWidth(),
+							getHeight()), mPaint);
 		}
 		// draw border
 		Paint paint = new Paint();
@@ -155,14 +191,13 @@ public class PaintBoard extends View implements OnTouchListener {
 				paint);
 	}
 
-
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
 		if (!bEditable) {
 			return false;
 		}
 		int pt_cnt = e.getPointerCount();
-		LOG.D("paintboard", "" + pt_cnt);
+//		LOG.D("paintboard", "" + pt_cnt);
 		if (pt_cnt >= 2 || mbZoom) {
 			cancelTemp();
 			mCurPolyline = null;
@@ -180,24 +215,30 @@ public class PaintBoard extends View implements OnTouchListener {
 	int mLineWidth;
 	MyPolyLine mCurPolyline = null;
 	List<PointF> mMoveTrack = new ArrayList<PointF>();
+	float mX, mY;
+	public static final float MIN_GAP = 5;
+	int test = 0;
+
 	private boolean drawLine(MotionEvent e) {
 		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
 		int action = e.getAction();
 		PointF[] pts = null;
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
+			test = 0;
 			mbDrawLine = true;
-			assert(mMoveTrack.size() == 0);
-			mMoveTrack.add(new PointF((e.getX() - rect.left) / rect.width(), (e
-					.getY() - rect.top) / rect.height()));
-			mCurPolyline = new MyPolyLine(null,
-					mCurColor, 10, mLineWidth, this);
+			assert (mMoveTrack.size() == 0);
+			mX = e.getX() - rect.left;
+			mY = e.getY() - rect.top;
+			mMoveTrack.add(new PointF(mX / rect.width(), mY / rect.height()));
+			mCurPolyline = new MyPolyLine(null, mCurColor, 11, mLineWidth, this);
+			mCurPolyline.setPaint(mLineFlag, mCurColor, 10);
 			startDrawTemp(mCurPolyline);
 			return true;
 		case MotionEvent.ACTION_CANCEL:
 			if (mbDrawLine) {
 				mbDrawLine = false;
-//				mDrawList.remove(mCurPolyline);
+				// mDrawList.remove(mCurPolyline);
 				mMoveTrack.clear();
 				mCurPolyline = null;
 				cancelTemp();
@@ -206,23 +247,33 @@ public class PaintBoard extends View implements OnTouchListener {
 		case MotionEvent.ACTION_MOVE:
 			if (mbDrawLine) {
 				int historySize = e.getHistorySize();
+				float x, y;
 				for (int i = 0; i < historySize; i++) {
-					mMoveTrack.add(new PointF((e.getHistoricalX(i) - rect.left)
-							/ rect.width(), (e.getHistoricalY(i) - rect.top)
-							/ rect.height()));
+					x = e.getHistoricalX(i) - rect.left;
+					y = e.getHistoricalY(i) - rect.top;
+					if (Math.sqrt((mX - x) * (mX - x) + (mY - y) * (mY - y)) > MIN_GAP) {
+						mMoveTrack.add(new PointF(x / rect.width(), y
+								/ rect.height()));
+						mX = x;
+						mY = y;
+					} else {
+						test++;
+					}
+
 				}
-				mMoveTrack.add(new PointF(
-						(e.getX() - rect.left) / rect.width(),
-						(e.getY() - rect.top) / rect.height()));
+				x = e.getX() - rect.left;
+				y = e.getY() - rect.top;
+				if (Math.sqrt((mX - x) * (mX - x) + (mY - y) * (mY - y)) > MIN_GAP) {
+					mMoveTrack.add(new PointF(x / rect.width(), y
+							/ rect.height()));
+					mX = x;
+					mY = y;
+				} else {
+					test++;
+				}
+
 				pts = new PointF[mMoveTrack.size()];
 				mMoveTrack.toArray(pts);
-//				// remove the previous one
-//				mDrawList.remove(mCurPolyline);
-//				// add the updated one
-//				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
-//						mCurColor, 10, mLineWidth, this);
-//				mDrawList.add(mCurPolyline);
-//				drawMyDraw(mCurPolyline);
 				mCurPolyline.genPatn(pts);
 				drawTemp();
 				invalidate();
@@ -236,15 +287,11 @@ public class PaintBoard extends View implements OnTouchListener {
 						(e.getY() - rect.top) / rect.height()));
 				pts = new PointF[mMoveTrack.size()];
 				mMoveTrack.toArray(pts);
-				// remove the previous one
-//				mDrawList.remove(mCurPolyline);
-//				// add the updated one
-//				mCurPolyline = new MyPolyLine(mMoveTrack.toArray(pts),
-//						mCurColor, 10, mLineWidth, this);
-//				add(mCurPolyline);
 				mCurPolyline.genPatn(pts);
 				drawTemp();
 				commitTemp();
+//				LOG.D("memory", "ignored point:" + test);
+//				LOG.D("memory", "total point:" + mMoveTrack.size());
 				mMoveTrack.clear();
 				mCurPolyline = null;
 				return true;
@@ -294,18 +341,24 @@ public class PaintBoard extends View implements OnTouchListener {
 		return false;
 	}
 
+	public static int MAX_HISTORY = 64;
+
 	public Mydraw add(Mydraw draw) {
+		if(draw == null)return null;
 		// abandon the tail
+		//TODO:
 		if (mCurOp != null) {
 			int opindex = mOperList.indexOf(mCurOp);
 			if (opindex != -1 && opindex != mOperList.size() - 1) {
-				mOperList = mOperList.subList(0, opindex + 1);
 				List<AbstractOperation> temp = mOperList;
 				mOperList = new ArrayList<AbstractOperation>();
 				for (int i = 0; i < opindex; i++) {
 					mOperList.add(temp.get(i));
 				}
+				temp.clear();
 			}
+			//clear the unreachable draws
+			//because a draw must be bound to a history
 			Mydraw previousDraw = mCurOp.getDraw();
 			if (previousDraw != null) {
 				int hisindex = mHistory.indexOf(previousDraw);
@@ -315,21 +368,55 @@ public class PaintBoard extends View implements OnTouchListener {
 					for (int i = 0; i < hisindex; i++) {
 						mHistory.add(temp.get(i));
 					}
+					temp.clear();
 				}
 			}
 		}
+		//if the count of draws is greater than MAX_HISTORY, then combine half of them
+		if (mDrawList.size() >= MAX_HISTORY) {
+			//combine to a MyDrawable
+			Bitmap bmp = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
+			Canvas canvas = new Canvas(bmp);
+			for(int i=0;i<MAX_HISTORY;i++) {
+				mDrawList.get(i).draw(canvas);
+			}
+			List<Mydraw> tempDraw = mDrawList;
+			List<AbstractOperation> tempOp = mOperList;
+			List<Mydraw> tempHis = mHistory;
+			mDrawList = new ArrayList<Mydraw>();
+			mOperList = new ArrayList<AbstractOperation>();
+			mHistory = new ArrayList<Mydraw>();
+			for(int i=MAX_HISTORY;i<tempDraw.size();i++) {
+				mDrawList.add(tempDraw.get(i));
+				mOperList.add(tempOp.get(i));
+				mHistory.add(tempHis.get(i));
+			}
+			tempDraw.clear();
+			tempOp.clear();
+			tempHis.clear();
+			MyDrawable combineDrawable = new MyDrawable(new BitmapDrawable(bmp), new RectF(0,0,1,1),
+					0, this);
+			AppendOperation operation = new AppendOperation(combineDrawable, mDrawList);
+			mHistory.add(0,combineDrawable);
+			mDrawList.add(0,combineDrawable);
+			mOperList.add(0,operation);
+//			LOG.D("history", "history raise too large, combine it!");
+		}
+		//now , time to add the current one
 		draw.setView(this);
 		drawMyDraw(draw);
 		mHistory.add(draw);
 		mCurOp = new AppendOperation(draw, mDrawList);
+//		mDrawList.add(draw);
 		mOperList.add(mCurOp);
 		mCurOp.execute();
-
+		
 		invalidate();
 		return draw;
 	}
 
 	public boolean canRedo() {
+		LOG.D("paintboard", "flag:"+mCurOp.mFlag);
 		if (mCurOp != null && mCurOp.canRedo()) {
 			return true;
 		}
@@ -344,6 +431,7 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 
 	public boolean canUndo() {
+		LOG.D("paintboard", "flag:"+mCurOp.mFlag);
 		if (mCurOp != null && mCurOp.canUndo()) {
 			return true;
 		}
@@ -377,17 +465,10 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 
 	public void clear() {
-		mCurOp = new ClearOperation(mDrawList);
-		mOperList.add(mCurOp);
-		mCurOp.execute();
-		invalidateAll();
-		Log.d("draw", "clear");
-	}
-
-	public void permenantClear() {
 		mOperList.clear();
 		mDrawList.clear();
 		mHistory.clear();
+		undraw.clear();
 		// TODO:
 		mCurOp = null;
 		invalidateAll();
@@ -399,19 +480,17 @@ public class PaintBoard extends View implements OnTouchListener {
 	}
 
 	public Bitmap toBitmap() {
-		Rect rect = new Rect(getLeft(), getTop(), getRight(), getBottom());
-		Bitmap bitmap = Bitmap.createBitmap(rect.width(), rect.height(),
-				Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(bitmap);
-		onDraw(canvas);
-		return bitmap;
+		return mBitmap;
 	}
 
 	public Parcelable toParcel() {
+		assert (mBitmap != null);
+		String filePath = "rawimage.png";
+//		LOG.D("memory", filePath);
 		MyDrawable.setContext(mContext);
 		FileOutputStream output = null;
 		try {
-			output = mContext.openFileOutput("rawimage.png",
+			output = mContext.openFileOutput(filePath,
 					Context.MODE_WORLD_WRITEABLE);
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -425,9 +504,7 @@ public class PaintBoard extends View implements OnTouchListener {
 				e.printStackTrace();
 			}
 		}
-		MyDrawable mydraw = new MyDrawable("rawimage.png",
-				new RectF(0, 0, 1, 1), 0, null);
-		return mydraw;
+		return new MyDrawable(filePath, 0, null);
 	}
 
 	public void setColor(int color) {
@@ -467,5 +544,13 @@ public class PaintBoard extends View implements OnTouchListener {
 
 	public int getLineWidth() {
 		return mLineWidth;
+	}
+
+	public void recycle() {
+		System.gc();
+	}
+
+	public int getPaint() {
+		return mLineFlag;
 	}
 }

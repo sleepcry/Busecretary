@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import utils.LOG;
+import android.R.integer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -157,6 +158,9 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			public void onProgressChanged(SeekBar sb, int progress,
 					boolean fromUser) {
 				if (fromUser) {
+					if(progress <=0) {
+						progress = 1;
+					}
 					mLine.setLineWidth(progress);
 					mPb.setLineWidth(progress);
 					mTextSize = (int) (Math.sqrt(progress) * density * 5);
@@ -204,11 +208,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 
 			@Override
 			public void onColorChange(int color) {
-				mPb.setColor(color);
-				mLine.setColor(color);
-				mTempView.setTextColor(color);
-				mTempText.setTextColor(color);
-				mTempText.setBackgroundColor((~color) | 0xff101010);
+				colorChanged(color);
 			}
 
 		});
@@ -346,6 +346,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mTempText.setVisibility(View.GONE);
 			mTempView.setVisibility(View.VISIBLE);
 			mTempView.setText(mTempText.getText());
+			mTempView.setBackgroundResource(R.drawable.transluent);
 			return true;
 		}
 		return false;
@@ -532,6 +533,8 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			return true;
 		case R.id.menusetting:
 			Intent intent = new Intent(this, Settings.class);
+			intent.putExtra(Settings.COLOR, mPb.getColor());
+			intent.putExtra(Settings.EXTRAS, mPb.getPaint());
 			startActivityForResult(intent, SETTINGS);
 			return true;
 		case R.id.menucolor:
@@ -560,6 +563,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		finish();
 		this.overridePendingTransition(R.anim.zoom_fade_out,
 				R.anim.zoom_fade_in);
+		mPb.recycle();
 	}
 
 	public void onBackPressed() {
@@ -654,7 +658,9 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 				updateContent(bitmap);
 				break;
 			case SETTINGS:
-				// TODO:
+				mPb.setPaint(data.getIntExtra(Settings.EXTRAS, 0));
+				colorChanged(data.getIntExtra(Settings.COLOR, mPb.getColor()));
+				savePref();
 				break;
 			}
 		}
@@ -762,12 +768,19 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		}
 		if (prefs.contains(AppendActivity.LINE_WIDTH)) {
 			int width = prefs.getInt(AppendActivity.LINE_WIDTH, 3);
+			if(width <=0) {
+				width = 1;
+			}
 			mPb.setLineWidth(width);
 			mLine.setLineWidth(width);
 			mTextSize = (int) (Math.sqrt(width) * density * 5);
 			mTempText.setTextSize(mTextSize);
 			mTempView.setTextSize(mTextSize);
 			mSeekBar.setProgress(width);
+		}
+		if(prefs.contains(AppendActivity.LINE_STYLE)) {
+			int style = prefs.getInt(AppendActivity.LINE_STYLE, 0);
+			mPb.setPaint(style);
 		}
 	}
 
@@ -776,6 +789,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 				.edit();
 		editor.putInt(AppendActivity.COLOR, mPb.getColor());
 		editor.putInt(AppendActivity.LINE_WIDTH, mPb.getLineWidth());
+		editor.putInt(AppendActivity.LINE_STYLE, mPb.getPaint());
 		editor.commit();
 	}
 

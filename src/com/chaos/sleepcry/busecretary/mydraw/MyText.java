@@ -3,10 +3,7 @@ package com.chaos.sleepcry.busecretary.mydraw;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
-import android.view.View;
 
 public class MyText extends Mydraw {
 	String mText;

@@ -20,16 +20,19 @@ import com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity;
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
+import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
+import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
 
-public class AppendActivity extends Activity {
+public class AppendActivity extends Activity implements ShakeShuffleListener {
 	PaintBoard mPb = null;
 	static final int VIEW_REQUEST = 0;
 	TextView mTitle = null;
-
+	ShakeShuffle mShakeShuffle;
 	public static final String COLOR = "c";
 	public static final String LINE_WIDTH = "lw";
+	public static final String LINE_STYLE = "ls";
 	public static final String SHAREPREF = "com.chaos.sleepcry.busecretary.append.AppendActivity";
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class AppendActivity extends Activity {
 		startActivityForResult(intent, VIEW_REQUEST);
 		this.overridePendingTransition(R.anim.zoom_fade_out,
 				R.anim.zoom_fade_in);
+		mPb.recycle();
 	}
 
 	public void ok(View v) {
@@ -135,7 +139,7 @@ public class AppendActivity extends Activity {
 				&& resultCode == RESULT_OK) {
 			Bundle extras = data.getExtras();
 			if (extras != null) {
-				MyDrawable mydraw = extras.getParcelable("background");
+				MyDrawable mydraw = extras.getParcelable(PaintBoard.BACKGROUND);
 				mPb.clear();
 				mPb.add(mydraw);
 			}
@@ -150,13 +154,50 @@ public class AppendActivity extends Activity {
 		}
 		if (prefs.contains(LINE_WIDTH)) {
 			int width = prefs.getInt(LINE_WIDTH, 3);
+			if (width <= 0) {
+				width = 1;
+			}
 			mPb.setLineWidth(width);
+		}
+		if (prefs.contains(AppendActivity.LINE_STYLE)) {
+			int style = prefs.getInt(AppendActivity.LINE_STYLE, 0);
+			mPb.setPaint(style);
 		}
 	}
 
 	public void onResume() {
 		super.onResume();
 		loadPrefs();
+		mShakeShuffle = new ShakeShuffle(this);
+		mShakeShuffle.setShakeShuffleListener(this);
+		mShakeShuffle.start();
+	}
+
+	public void onPause() {
+		mShakeShuffle.pause();
+		super.onPause();
+	}
+
+	@Override
+	public void onShakeLeft() {
+		mPb.post(new Runnable() {
+
+			@Override
+			public void run() {
+				mPb.undo();
+			}
+		});
+	}
+
+	@Override
+	public void onShakeRight() {
+		mPb.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				mPb.redo();
+			}
+		});
 	}
 
 }

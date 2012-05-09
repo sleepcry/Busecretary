@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bs="http://schemas.android.com/apk/res/com.chaos.sleepcry.busecretary"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <com.chaos.sleepcry.busecretary.mydraw.PaintBoard
+        android:id="@+id/surfaceView1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true" />
+    <LinearLayout
+        android:id="@+id/color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" 
+        android:layout_below="@id/surfaceView1"
+        android:layout_alignParentLeft="true">
+        <EditText
+            android:id="@+id/a"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:hint="a"
+            android:inputType="number"
+            android:maxEms="3"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:textSize="15dp" />
+        <EditText
+            android:id="@+id/r"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:hint="r"
+            android:inputType="number"
+            android:maxEms="3"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:textSize="15dp" />
+        <EditText
+            android:id="@+id/g"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:hint="g"
+            android:inputType="number"
+            android:maxEms="3"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:textSize="15dp" />
+        <EditText
+            android:id="@+id/b"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:hint="b"
+            android:inputType="number"
+            android:maxEms="3"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:textSize="15dp" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/color"
+        android:onClick="onReset"
+        android:text="@string/reset"
+        android:textSize="20dp" />
+    <Button
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/color"
+        android:layout_toRightOf="@id/reset"
+        android:onClick="onOK"
+        android:paddingLeft="10dp"
+        android:text="@android:string/ok"
+        android:textSize="20dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ok" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            <CheckBox
+                android:id="@+id/flur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="changeXferMode"
+                android:text="@string/flur" />
+            <CheckBox
+                android:id="@+id/emboss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="changeXferMode"
+                android:text="@string/emboss" />
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <RadioButton
+                    android:id="@+id/clear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/erase" />
+                <RadioButton
+                    android:id="@+id/darken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/darken" />
+                <RadioButton
+                    android:id="@+id/dst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/dst" />
+                <RadioButton
+                    android:id="@+id/dst_atop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/dst_atop" />
+                <RadioButton
+                    android:id="@+id/dst_in"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/dst_in" />
+                <RadioButton
+                    android:id="@+id/dst_out"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/dst_out" />
+                <RadioButton
+                    android:id="@+id/dst_over"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/dst_over" />
+                <RadioButton
+                    android:id="@+id/lighten"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/lighten" />
+                <RadioButton
+                    android:id="@+id/multiply"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/multiply" />
+                <RadioButton
+                    android:id="@+id/screen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/screen" />
+                <RadioButton
+                    android:id="@+id/src"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:onClick="changeXferMode"
+                    android:text="@string/src" />
+                <RadioButton
+                    android:id="@+id/src_atop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/src_atop" />
+                <RadioButton
+                    android:id="@+id/src_in"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/src_in" />
+                <RadioButton
+                    android:id="@+id/src_out"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/src_out" />
+                <RadioButton
+                    android:id="@+id/src_over"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/src_over" />
+                <RadioButton
+                    android:id="@+id/xor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/xor" />
+                <RadioButton
+                    android:id="@+id/avoid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/avoid" />
+                <RadioButton
+                    android:id="@+id/target"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="changeXferMode"
+                    android:text="@string/target" />
+            </RadioGroup>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

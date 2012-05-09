@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import utils.LOG;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -12,7 +14,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -45,7 +46,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	private MainView mCur = null;
 	private MainView mNext = null;
 	private MainView mPrevious = null;
-	private Bitmap mCurBmp = null;
 	DatePickerView mdpv = null;
 	/*
 	 * the date used to define a notification
@@ -62,7 +62,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	/*
 	 * @{ fields definition
 	 */
-	public static final int DB_VER = 7;
+	public static final int DB_VER = 9;
 	public static final String NOTI_ID = "noti_id";
 	public static final int ROLLBACK = 0;
 	public static final int COMMIT_NEXT = 1;
@@ -202,6 +202,11 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 					// don`t move to previous if this is the first
 					if (mCurNoti.getLocation() < 1
 							&& motion.getX() - mPosDown.x > 0) {
+						break;
+					}
+					//don't move to next if this is the last
+					if (mCurNoti.getLocation() == mLstNotis.size()
+							&& motion.getX() - mPosDown.x < 0) {
 						break;
 					}
 					mPosCur.set((int) motion.getX(), (int) motion.getY());
@@ -391,7 +396,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			 */
 			mDB.insert(mCurNoti.getId(), mCurNoti.getDay().getCalendar()
 					.getTimeInMillis(), mCurNoti.getDesc(), mCurNoti.getRing(),
-					mCurNoti.getCategory().getId(), mCur.getBmp());
+					mCurNoti.getCategory().getId(), null);
 			// synchronize the list
 			mLstNotis.add(mCurNoti.getLocation(), mCurNoti);
 		}
@@ -423,6 +428,11 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	public void onDestroy() {
 		super.onDestroy();
 		switchNotif(null);
+		for(int i=0;i<mLstNotis.size();i++) {
+			mLstNotis.get(i).setBmp(null);
+		}
+		mCurNoti.setBmp(null);
+		System.gc();
 	}
 
 	@Override
@@ -460,6 +470,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		mPrevious.notifyUI(pre);
 		mNext.notifyUI(next);
 		mCur.setData(mCurNoti);
+		LOG.logMem(this);
 	}
 
 	private NotificationData getById(int id) {
@@ -485,18 +496,18 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 				switchNotif(data);
 			}
 			// if this is the last one
-			else {
-				int maxId = 0;
-				if (mLstNotis.size() >= 1) {
-					maxId = mLstNotis.get(mLstNotis.size() - 1).getId();
-				}
-				if (mCurNoti.getId() > maxId) {
-					maxId = mCurNoti.getId();
-				}
-				NotificationData data = new NotificationData(maxId + 1,
-						mLstNotis.size() + 1);
-				switchNotif(data);
-			}
+//			else {
+//				int maxId = 0;
+//				if (mLstNotis.size() >= 1) {
+//					maxId = mLstNotis.get(mLstNotis.size() - 1).getId();
+//				}
+//				if (mCurNoti.getId() > maxId) {
+//					maxId = mCurNoti.getId();
+//				}
+//				NotificationData data = new NotificationData(maxId + 1,
+//						mLstNotis.size() + 1);
+//				switchNotif(data);
+//			}
 		}
 		return true;
 	}

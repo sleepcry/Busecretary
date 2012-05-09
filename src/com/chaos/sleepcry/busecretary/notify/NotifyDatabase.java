@@ -96,6 +96,11 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		if (bmp != null) {
 			File file = new File(mContext.getExternalFilesDir(null), "img" + id
 					+ ".png");
+			if(file != null && file.exists()) {
+				file.delete();
+				file = new File(mContext.getExternalFilesDir(null), "img" + id
+						+ ".png");
+			}
 			try {
 				FileOutputStream output = new FileOutputStream(file);
 				bmp.compress(Bitmap.CompressFormat.PNG, 0, output);
@@ -105,8 +110,6 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			}
 
 			cv.put(BMP, file.getAbsolutePath());
-		}else {
-			cv.put(BMP, "");			
 		}
 		//check if records with this id exist
 		Cursor c = db.query(TBL_NAME, new String[]{ID}, ID + "=" + id, null, null, null, null);
@@ -120,7 +123,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		}
 		db.close();
 	}
-
+	
 	private void clear(long time) {
 		// delete the records whose time flag is earlier than the given time
 		SQLiteDatabase db = getWritableDatabase();
@@ -152,14 +155,6 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			// update the mId according to the records from the database
 			n.setId(c.getInt(c.getColumnIndex(ID)));
 			n.setLocation(loc++);
-//			ByteArrayInputStream input = new ByteArrayInputStream(c.getBlob(c
-//					.getColumnIndex(BMP)));
-//			Bitmap bmp = null;
-//			try {
-//				bmp = BitmapFactory.decodeStream(input);
-//			} catch (Exception e) {
-//				bmp = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-//			}
 			n.setBmpPath(c.getString(c.getColumnIndex(BMP)));
 			lstRet.add(n);
 		} while (c.moveToNext());

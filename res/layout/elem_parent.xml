@@ -24,6 +24,7 @@
         android:id="@+id/layer"
         android:layout_width="50dp"
         android:layout_height="match_parent" 
-        android:background="#77f7"/>
+        android:background="#77f7"
+        android:paddingLeft="5dp"/>
 
 </LinearLayout>

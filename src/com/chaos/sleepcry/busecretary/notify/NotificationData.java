@@ -93,6 +93,9 @@ public class NotificationData {
 		return mBitMap;
 	}
 	public void setBmp(Bitmap bmp) {
+		if(mBitMap != null) {
+			mBitMap.recycle();
+		}
 		mBitMap = bmp;
 	}
 }

@@ -6,9 +6,9 @@ import android.graphics.EmbossMaskFilter;
 import android.graphics.MaskFilter;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.view.View;
 
 public abstract class Mydraw implements Comparable<Mydraw> {
+	public static float DIV = 1f;
 	// used to compare
 	int mLayer;
 	PaintBoard mParent = null;
@@ -34,7 +34,7 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 		return mLayer;
 	}
 
-	static protected MaskFilter mBlur = new BlurMaskFilter(8,
+	static protected MaskFilter mBlur = new BlurMaskFilter(16,
 			BlurMaskFilter.Blur.NORMAL);
 	static protected MaskFilter mEmboss = new EmbossMaskFilter(new float[] { 1,
 			1, 1 }, 0.4f, 6, 3.5f);
@@ -60,10 +60,15 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 			}
 		}
 	}
-
+	public Rect getBounds() {
+		int l = mParent.getLeft();
+		int t = mParent.getTop();
+		int r = mParent.getRight();
+		int b = mParent.getBottom();
+		return new Rect(l, t,(int)(l+(r-l)*DIV), (int)(t+(b-t)*DIV));
+	}
 	public PointF getAbsFromRel(PointF ptf) {
-		Rect bound = new Rect(mParent.getLeft(), mParent.getTop(),
-				mParent.getRight(), mParent.getBottom());
+		Rect bound = getBounds();
 		PointF ptf2 = new PointF();
 		ptf2.x = bound.left + bound.width() * ptf.x;
 		ptf2.y = bound.top + bound.height() * ptf.y;

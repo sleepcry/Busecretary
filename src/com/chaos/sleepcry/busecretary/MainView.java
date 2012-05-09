@@ -1,7 +1,14 @@
 package com.chaos.sleepcry.busecretary;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import utils.LOG;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -142,12 +149,34 @@ public class MainView extends LinearLayout implements OnClickListener {
 					.setText("Category:  " + data.getCategory().getDesc());
 		}
 		if (data.getBmp() == null) {
-			MyDrawable mydraw = new MyDrawable(new BitmapDrawable(
-					data.getBmpPath()), new RectF(0, 0, 1, 1), 0,mPb);
-			data.setBmp(mydraw.getBmp());
-			mPb.permenantClear();
-			mPb.add(mydraw);
-			mPb.invalidate();
+			LOG.D("memory", "bmp path:" + data.getBmpPath());
+			String path = data.getBmpPath();
+			if(path != null && path.length() > 0) {
+			try {
+				System.gc();
+					File file = new File(data.getBmpPath());
+					FileInputStream fis = new FileInputStream(file);
+					BitmapFactory.Options opts = new BitmapFactory.Options();
+					opts.inJustDecodeBounds = false;
+					opts.inSampleSize=4;
+					Bitmap bmp = BitmapFactory.decodeStream(fis, null, opts);
+					LOG.D("memory", "bitmap bounds:" + opts.outWidth + ","
+							+ opts.outHeight);
+					MyDrawable mydraw = new MyDrawable(new BitmapDrawable(
+							bmp), new RectF(0, 0, 1, 1), 0,mPb);
+					data.setBmp(bmp);
+					mPb.clear();
+					mPb.add(mydraw);
+					mPb.invalidate();
+					fis.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}catch(IOException ioe) {
+					
+				}
+				
+			}
 		}
 	}
 	public void collapse(){
