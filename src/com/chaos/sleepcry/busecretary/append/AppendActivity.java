@@ -7,11 +7,14 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,12 @@ import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
+import com.google.ads.Ad;
+import com.google.ads.AdListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdRequest.ErrorCode;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 public class AppendActivity extends Activity implements ShakeShuffleListener {
 	PaintBoard mPb = null;
@@ -62,6 +71,9 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		});
 		mTitle = (TextView) findViewById(R.id.title);
 		this.registerForContextMenu(mPb);
+		mAppendPlayer = MediaPlayer.create(this, R.raw.append);
+		mClearPlayer = MediaPlayer.create(this, R.raw.clear);
+		mAlertPlayer = MediaPlayer.create(this, R.raw.nomatch);
 	}
 
 	private void edit() {
@@ -72,10 +84,11 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 				R.anim.zoom_fade_in);
 		mPb.recycle();
 	}
-
+	private MediaPlayer mAppendPlayer,mClearPlayer,mAlertPlayer;
 	public void ok(View v) {
 		String desc = mTitle.getText().toString();
 		if(desc == null || desc.length() == 0) {
+			mAlertPlayer.start();
 			new AlertDialog.Builder(this)
 			.setTitle(android.R.string.untitled)
 			.setIcon(android.R.drawable.ic_dialog_alert)
@@ -88,8 +101,9 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		cal.add(Calendar.DATE, 1);
 		NotificationData data = new NotificationData();
 		NotifyDatabase db = new NotifyDatabase(this, BusecretaryActivity.DB_VER);
+		mAppendPlayer.start();
 		db.insert(db.getMaxId() + 1, cal.getTimeInMillis(), desc,
-				data.getRing(), data.getRepeatCategory().getId(), mPb.toBitmap());
+				data.getRing(), data.getRepeatCategory().getId(), mPb.toBitmap(),null);
 		Toast.makeText(this, getString(R.string.autosave), Toast.LENGTH_SHORT)
 				.show();
 		mTitle.setText("");
@@ -97,6 +111,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 
 	public void clear(View v) {
 		if (v.getId() == R.id.btn_clear) {
+			mClearPlayer.start();
 			mPb.clear();
 		}
 	}
@@ -135,14 +150,11 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		case R.id.menuedit:
 			edit();
 			return true;
-		case R.id.menuexit:
-			return true;
-
 		}
 		return false;
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (data != null && requestCode == VIEW_REQUEST
 				&& resultCode == RESULT_OK) {

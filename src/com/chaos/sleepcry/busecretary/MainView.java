@@ -11,15 +11,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -29,19 +30,23 @@ import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 
-public class MainView extends LinearLayout implements OnClickListener {
+public class MainView extends LinearLayout {
 	/*
 	 * @{ define the UI elements
 	 */
 	private ListView mList = null;
 	PaintBoard mPb = null;
+	View mEmptyView = null;
 	/*
 	 * @}
 	 */
 	private PaneAnimation mAnimation = null;
 	private BusecretaryActivity mMainFrm = null;
 	private OperationAdapter mAdapter = null;
+	private Button mMore;
 
 	public MainView(BusecretaryActivity context) {
 		super(context);
@@ -52,24 +57,49 @@ public class MainView extends LinearLayout implements OnClickListener {
 		 */
 		mList = (ListView) findViewById(R.id.listView1);
 		mPb = (PaintBoard) findViewById(R.id.mainsurface);
+		mEmptyView = findViewById(R.id.empty);
 		mPb.setEditable(false);
 		mAdapter = new OperationAdapter(context);
-		Button btn = (Button) LayoutInflater.from(context).inflate(
+		mMore = (Button) LayoutInflater.from(context).inflate(
 				R.layout.normalbtn, null);
-		btn.setText(R.string.more);
-		btn.setOnClickListener(this);
-		mList.addFooterView(btn);
+		mMore.setText(R.string.more);
+		mMore.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mAdapter.fetchmore()) {
+					mList.invalidateViews();
+					mExpandPlayer.start();
+					if (!mAdapter.hasMore()) {
+						mList.removeFooterView(mMore);
+					}
+				}
+			}
+		});
+		mList.addFooterView(mMore);
 		mList.setAdapter(mAdapter);
 
 		/*
 		 * @}
 		 */
 		mAnimation = new PaneAnimation(0);
+		mCollapsePlayer = MediaPlayer.create(context, R.raw.waterdrop);
+		mExpandPlayer = MediaPlayer.create(context, R.raw.waterdrop);
+		mDockPlayer = MediaPlayer.create(context, R.raw.dock);
+		AdView adView = (AdView) findViewById(R.id.adView);
+		adView.loadAd(new AdRequest());
 	}
 
 	public void setData(NotificationData data) {
-		mAdapter.setData(data);
-		mAdapter.notifyDataSetChanged();
+		if (null == data) {
+			mList.setVisibility(View.GONE);
+			mPb.setVisibility(View.GONE);
+			mEmptyView.setVisibility(View.VISIBLE);
+		} else {
+			mList.setVisibility(View.VISIBLE);
+			mPb.setVisibility(View.VISIBLE);
+			mEmptyView.setVisibility(View.GONE);
+			mAdapter.setData(data);
+		}
 	}
 
 	public PaintBoard getPaintBoard() {
@@ -84,23 +114,39 @@ public class MainView extends LinearLayout implements OnClickListener {
 		startAnimation(mAnimation);
 	}
 
-	public void translate(int x, long duration) {
+	AnimationListener mCommitListener = new AnimationListener() {
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			mDockPlayer.start();
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onAnimationStart(Animation animation) {
+			// TODO Auto-generated method stub
+
+		}
+
+	};
+
+	public void translate(int x, long duration, boolean effect) {
 		PaneAnimation anim = new PaneAnimation(mAnimation.getX(), 0, 0,
 				duration);
 		mAnimation.addX(x);
 		anim.addX(x);
+		if (effect) {
+			anim.setAnimationListener(mCommitListener);
+		}
 		anim.setInterpolator(new DecelerateInterpolator());
 		anim.setDuration(duration);
 		startAnimation(anim);
 	}
-
-//	public String getDesc() {
-//		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.WHAT);
-//		if (mBtnDesc == null) {
-//			return null;
-//		}
-//		return mBtnDesc.getText().toString();
-//	}
 
 	private void setWhat(CharSequence desc) {
 		Button mBtnDesc = (Button) this.findViewById(OperationAdapter.WHAT);
@@ -117,15 +163,19 @@ public class MainView extends LinearLayout implements OnClickListener {
 	}
 
 	public void reset() {
-//		setWhat("");
+		// setWhat("");
 		mAdapter.reset();
+//		mAdapter.notifyDataSetChanged();
 		mList.invalidateViews();
+		mList.removeFooterView(mMore);
+		mList.addFooterView(mMore);
 	}
 
 	public void notifyUI(NotificationData data) {
 		if (data == null) {
 			return;
 		}
+		LOG.D("NotificationData",data.toString());
 		final String str1 = OperationAdapter.str1;
 		final String str2 = OperationAdapter.str2;
 		// when
@@ -161,13 +211,6 @@ public class MainView extends LinearLayout implements OnClickListener {
 			} else {
 				mBtnRingDesc.setText("choose a ring here...");
 			}
-		}
-		// weather?
-		Button btnWeatherButton = (Button) findViewById(OperationAdapter.WEATHER);
-		if (btnWeatherButton != null) {
-			btnWeatherButton.setText(Html.fromHtml(str1
-					+ mMainFrm.getString(R.string.weather) + str2
-					+ mMainFrm.getString(android.R.string.unknownName)));
 		}
 		// search?
 		Button btnSearch = (Button) findViewById(OperationAdapter.SEARCH);
@@ -215,22 +258,17 @@ public class MainView extends LinearLayout implements OnClickListener {
 		}
 	}
 
-	public void collapse() {
-		mAdapter.collapse();
-		mList.invalidateViews();
-	}
+	private MediaPlayer mCollapsePlayer, mExpandPlayer, mDockPlayer;
 
-	@Override
-	public void onClick(View v) {
-		if (v instanceof Button) {
-			Button btn = (Button) v;
-			String content = btn.getText().toString();
-			if (content.equals("more...")) {
-				mAdapter.fetchmore();
-				mList.invalidateViews();
+	public void collapse() {
+		if (mAdapter.collapse()) {
+			mList.invalidateViews();
+			mCollapsePlayer.start();
+			mList.removeFooterView(mMore);	
+			if (mAdapter.hasMore()) {
+				mList.addFooterView(mMore);
 			}
 		}
-
 	}
 
 	public void onMeasure(int width, int height) {

@@ -19,8 +19,7 @@
             android:alwaysRetainTaskState="false"
             android:finishOnTaskLaunch="true"
             android:multiprocess="false"
-            android:noHistory="false"
-            android:process=":remote" >
+            android:noHistory="false" >
         </activity>
         <activity
             android:name="com.chaos.sleepcry.busecretary.loading.LoadingActivity"
@@ -34,14 +33,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.google.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation" />
+        <activity
             android:name="com.chaos.sleepcry.busecretary.append.AppendActivity"
             android:icon="@drawable/todo4"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
-        <activity android:name="com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity">
+        <activity android:name="com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity" >
         </activity>
         <receiver android:name="com.chaos.sleepcry.busecretary.notify.NotifyReceiver" >
             <intent-filter>
@@ -62,10 +61,17 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
         </receiver>
-        <activity android:name=".canvasedit.Settings"
-            android:windowSoftInputMode="adjustPan"></activity>
+        <activity
+            android:name=".canvasedit.Settings"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.google.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 </manifest>

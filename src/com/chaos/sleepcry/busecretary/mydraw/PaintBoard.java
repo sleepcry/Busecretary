@@ -4,11 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import utils.LOG;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -22,12 +20,14 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+
+import com.chaos.sleepcry.busecretary.R;
 
 public class PaintBoard extends View implements OnTouchListener {
 	// all things need to draw on the canvas
@@ -67,6 +67,10 @@ public class PaintBoard extends View implements OnTouchListener {
 		bEditable = true;
 		mLineWidth = 3;
 		mPaint = new Paint(Paint.DITHER_FLAG);
+		mTouchPlayer = MediaPlayer.create(mContext, R.raw.waterdrop);
+		mRedoPlayer = MediaPlayer.create(mContext, R.raw.redo);
+		mUndoPlayer = MediaPlayer.create(mContext, R.raw.undo);
+		mAlertPlayer = MediaPlayer.create(mContext, R.raw.nomatch);
 	}
 
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -203,6 +207,7 @@ public class PaintBoard extends View implements OnTouchListener {
 			mCurPolyline = null;
 			mbDrawLine = false;
 			mMoveTrack.clear();
+			mAlertPlayer.start();
 			return zoom(e);
 		} else {
 			return drawLine(e);
@@ -227,6 +232,7 @@ public class PaintBoard extends View implements OnTouchListener {
 		case MotionEvent.ACTION_DOWN:
 			test = 0;
 			mbDrawLine = true;
+			mTouchPlayer.start();
 			assert (mMoveTrack.size() == 0);
 			mX = e.getX() - rect.left;
 			mY = e.getY() - rect.top;
@@ -320,6 +326,7 @@ public class PaintBoard extends View implements OnTouchListener {
 			if (mbZoom) {
 				mbZoom = false;
 			}
+			mAlertPlayer.start();
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
 			if (mbZoom) {
@@ -435,10 +442,11 @@ public class PaintBoard extends View implements OnTouchListener {
 		}
 		return false;
 	}
-
+	private MediaPlayer mRedoPlayer,mUndoPlayer,mTouchPlayer,mAlertPlayer;
 	public void redo() {
 		if (mCurOp != null && mCurOp.canRedo()) {
 			if (mCurOp.redo()) {
+				mRedoPlayer.start();
 				invalidateAll();
 				return;
 			}
@@ -448,12 +456,14 @@ public class PaintBoard extends View implements OnTouchListener {
 			mCurOp = mOperList.get(index + 1);
 		}
 		if (mCurOp != null && mCurOp.redo()) {
+			mRedoPlayer.start();
 			invalidateAll();
 		}
 	}
-
+	
 	public void undo() {
 		if (mCurOp != null && mCurOp.undo()) {
+			mUndoPlayer.start();
 			invalidateAll();
 			int index = mOperList.indexOf(mCurOp);
 			if (index != -1 && index > 0) {

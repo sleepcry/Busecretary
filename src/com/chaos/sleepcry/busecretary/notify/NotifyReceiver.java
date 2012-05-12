@@ -1,5 +1,9 @@
 package com.chaos.sleepcry.busecretary.notify;
 
+import java.util.Date;
+
+import utils.LOG;
+
 import com.chaos.sleepcry.busecretary.BusecretaryActivity;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.widget.BSRemoteView;
@@ -51,6 +55,16 @@ public class NotifyReceiver extends BroadcastReceiver {
 				}
 			}
 		}else{
+			String strWhat = intent.getExtras().getString(NotifyDatabase.WHAT);
+			long when = intent.getExtras().getLong(NotifyDatabase.WHEN);
+			String strWhere = intent.getExtras().getString(NotifyDatabase.WHERE);
+			String strUri = intent.getExtras().getString(NotifyDatabase.RING);
+			String strBmp = intent.getExtras().getString(NotifyDatabase.BMP);
+			LOG.D("notification", "receiver what?:"+strWhat);
+			LOG.D("notification", "receiver when?"+new Date(when).toGMTString());
+			LOG.D("notification", "receiver where?"+strWhere);
+			LOG.D("notification", "receiver ring?"+strUri);
+			LOG.D("notification", "receiver bmp?"+strBmp);
 			Intent intent2 = new Intent(c, NotifyActivity.class);
 			intent2.putExtras(intent.getExtras());
 			intent2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK

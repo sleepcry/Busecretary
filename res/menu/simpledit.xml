@@ -2,12 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:id="@+id/menuedit"
         android:title="@string/menuedit"
-        android:visible="true"></item>
+        android:visible="true"
+        android:icon="@drawable/pencil"></item>
     <item android:id="@+id/menuundo"
-        android:title="@string/menuundo"></item>
+        android:title="@string/menuundo"
+        android:icon="@drawable/undo"></item>
     <item android:id="@+id/menuredo"
-        android:title="@string/menuredo"></item>
-    <item android:id="@+id/menuexit"
-        android:title="@string/menuexit"></item>
+        android:title="@string/menuredo"
+        android:icon="@drawable/redo"></item>
 
 </menu>

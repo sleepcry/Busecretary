@@ -1,12 +1,16 @@
 package com.chaos.sleepcry.busecretary.canvasedit;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import utils.LOG;
-import android.R.integer;
+import utils.MathUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -28,10 +32,13 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Media;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,7 +63,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.chaos.sleepcry.busecretary.BusecretaryActivity;
 import com.chaos.sleepcry.busecretary.PaneAnimation;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.append.AppendActivity;
@@ -69,9 +75,12 @@ import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.MyText;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
+import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
+import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
 
 public class CanvasEditActivity extends Activity implements OnTouchListener,
-		ColorPickerDialog.OnColorChangedListener, ColorProvider {
+		ColorPickerDialog.OnColorChangedListener, ColorProvider,
+		ShakeShuffleListener {
 	PaintBoard mPb = null;
 	ListView mList = null;
 	boolean mbAnimating = false;
@@ -89,6 +98,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 	EditText mTempText = null;
 	Button mLoad;
 	ContentStatus mStatus;
+	ShakeShuffle mShakeShuffle;
 	Bitmap mTempBmp = null;
 	ImageView mStatusImage = null;
 	int mTextSize = 18;
@@ -158,7 +168,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			public void onProgressChanged(SeekBar sb, int progress,
 					boolean fromUser) {
 				if (fromUser) {
-					if(progress <=0) {
+					if (progress <= 0) {
 						progress = 1;
 					}
 					mLine.setLineWidth(progress);
@@ -217,6 +227,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		this.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 		density = outMetrics.density;
+		mLoadPlayer = MediaPlayer.create(this, R.raw.load);
 	}
 
 	private AnimationListener listener1 = new AnimationListener() {
@@ -261,11 +272,13 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		}
 
 	};
+	private MediaPlayer mLoadPlayer;
 
 	public void load(View v) {
 		if (!mStatus.isNormalDrawing()) {
 			mStatus.endPutContent();
 		} else {
+			mLoadPlayer.start();
 			new AlertDialog.Builder(this)
 					.setItems(R.array.loadsource,
 							new DialogInterface.OnClickListener() {
@@ -305,7 +318,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 										mTempText.requestFocus();
 										mTempText.setText(null);
 										InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-										
+
 										imm.showSoftInput(
 												mTempText,
 												InputMethodManager.SHOW_IMPLICIT);
@@ -468,8 +481,8 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		case MotionEvent.ACTION_UP:
 			if (motion.getEventTime() - motion.getDownTime() <= 200) {
 				Point p = new Point((int) motion.getX(), (int) motion.getY());
-				double orientation = Math.abs(BusecretaryActivity
-						.getOrientation(mPosDown, p));
+				double orientation = Math.abs(MathUtils.getOrientation(
+						mPosDown, p));
 				int h = Math.min(mHeight / 3, 200);
 				if (orientation >= Math.PI / 4 && p.y > h && mPosDown.y < h) {
 					hideElem();
@@ -484,7 +497,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 	private void hideElem() {
 		mAnim.addY(-mHeight);
 		mAnim.setAnimationListener(listener2);
-		mList.startAnimation(mAnim);		
+		mList.startAnimation(mAnim);
 	}
 
 	protected RectF getRelativeRect(Rect rect) {
@@ -524,6 +537,58 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mPb.clear();
 			return true;
 		case R.id.menushare:
+			File file = Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+			String path = file.getAbsolutePath();
+			if (!file.exists()) {
+				file.mkdirs();
+			}
+			file = new File(
+					Environment
+							.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+					"temp.png");
+			if (file != null && file.exists()) {
+				file.delete();
+				file = new File(
+						Environment
+								.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+						"temp.png");
+			}
+			try {
+				FileOutputStream output = new FileOutputStream(file);
+				mPb.toBitmap().compress(Bitmap.CompressFormat.PNG, 0, output);
+				output.flush();
+				output.close();
+			} catch (IOException e) {
+				LOG.W("ExternalStorage", "Error writing " + file);
+			}
+			try {
+				String url = Media.insertImage(getContentResolver(),
+						file.getAbsolutePath(), file.getName(), file.getName());
+				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+				LOG.D("output", file.getAbsolutePath());
+				Uri screenshotUri = Uri.parse(url);
+				sharingIntent.setType("*/*");
+				// sharingIntent.putExtra(Intent.EXTRA_STREAM,
+				// file.getAbsolutePath());
+				sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); 
+				sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+				sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "DrawingToDo");
+				sharingIntent.putExtra(Intent.EXTRA_TEXT, "DrawingToDo");
+				sharingIntent.putExtra(Intent.EXTRA_TITLE, "DrawingToDo");
+				sharingIntent
+						.putExtra(Intent.EXTRA_PHONE_NUMBER, "13851403984");
+				sharingIntent.putExtra(Intent.EXTRA_EMAIL,
+						new String[] { "liufengyunchina@gmail.com" });
+				// sharingIntent
+				// .putExtra(android.content.Intent.EXTRA_SUBJECT, "test");
+				// sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+				// "test send plain text");
+				startActivity(Intent.createChooser(sharingIntent,
+						"Share image using"));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 			return true;
 		case R.id.menulayer:
 			showElem();
@@ -768,7 +833,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		}
 		if (prefs.contains(AppendActivity.LINE_WIDTH)) {
 			int width = prefs.getInt(AppendActivity.LINE_WIDTH, 3);
-			if(width <=0) {
+			if (width <= 0) {
 				width = 1;
 			}
 			mPb.setLineWidth(width);
@@ -778,7 +843,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mTempView.setTextSize(mTextSize);
 			mSeekBar.setProgress(width);
 		}
-		if(prefs.contains(AppendActivity.LINE_STYLE)) {
+		if (prefs.contains(AppendActivity.LINE_STYLE)) {
 			int style = prefs.getInt(AppendActivity.LINE_STYLE, 0);
 			mPb.setPaint(style);
 		}
@@ -796,16 +861,20 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 	public void onResume() {
 		super.onResume();
 		loadPrefs();
+		mShakeShuffle = new ShakeShuffle(this);
+		mShakeShuffle.setShakeShuffleListener(this);
+		mShakeShuffle.start();
 	}
 
 	public void onPause() {
 		super.onPause();
 		savePref();
+		super.onPause();
 	}
 
 	@Override
 	public void colorChanged(int color) {
-		LOG.D("color",""+color);
+		LOG.D("color", "" + color);
 		mPb.setColor(color);
 		mLine.setColor(color);
 		mTempView.setTextColor(color);
@@ -814,20 +883,43 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 		mColorPal.changeColor(color);
 	}
 
-    ArrayList<ColorItem> mPreferColors = new ArrayList<ColorItem>();
-	
+	ArrayList<ColorItem> mPreferColors = new ArrayList<ColorItem>();
 
-	public int getCount(){
+	public int getCount() {
 		return mPreferColors.size();
 	}
-	public int getColor(int index){
+
+	public int getColor(int index) {
 		if (index < 0 || index >= mPreferColors.size()) {
 			return Color.WHITE;
 		}
 		return mPreferColors.get(index).getColor();
 	}
+
 	public void prepare() {
 		Collections.sort(mPreferColors);
+	}
+
+	@Override
+	public void onShakeLeft() {
+		mPb.post(new Runnable() {
+
+			@Override
+			public void run() {
+				mPb.undo();
+			}
+		});
+	}
+
+	@Override
+	public void onShakeRight() {
+		mPb.post(new Runnable() {
+
+			@Override
+			public void run() {
+				mPb.redo();
+			}
+		});
 	}
 
 }

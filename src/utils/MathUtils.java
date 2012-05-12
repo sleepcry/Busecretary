@@ -1,5 +1,6 @@
 package utils;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 
 public class MathUtils {
@@ -33,5 +34,11 @@ public class MathUtils {
 	}
 	public static double modular(PointF pt) {
 		return Math.sqrt(Math.pow(pt.x, 2) + Math.pow(pt.y, 2));
+	}
+	public static final double getOrientation(Point p1, Point p2) {
+		if (p2.x == p1.x) {
+			return 0;
+		}
+		return Math.atan((p2.y - p1.y) / (p2.x - p1.x));
 	}
 }

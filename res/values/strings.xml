@@ -41,7 +41,7 @@
     <string name="menusetting">settings</string>
     <string name="menucolor">color</string>
     <string name="pickcolor">Pick a Color</string>
-    <string name="flur">flur</string>
+    <string name="flur">blur</string>
     <string name="emboss">emboss</string>
     <string name="add">add</string>
     <string name="erase">erase</string>
@@ -68,4 +68,8 @@
 	<string name="more"><strong>more</strong>...</string>
 	<string name="search">search</string>
 	<string name="weather">weather</string>
+	<string name="empty">empty</string>
+	<string name="config">config</string>
+	<string name="remove">remove</string>
+	<string name="admob_pub_id">a14fa382f645984</string>
 </resources>

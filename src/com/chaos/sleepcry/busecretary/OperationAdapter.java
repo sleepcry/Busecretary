@@ -27,7 +27,6 @@ public class OperationAdapter extends BaseAdapter {
 	public static final int REPEAT = 3;
 	public static final int WHAT = 4;
 	public static final int SEARCH = 5;
-	public static final int WEATHER = 7;
 	private int mLayer;
 	NotificationData mData;
 	BusecretaryActivity mCtxt;
@@ -49,13 +48,13 @@ public class OperationAdapter extends BaseAdapter {
 		ArrayList<InfoObj> layer1 = new ArrayList<InfoObj>();
 		layer1.add(new InfoObj("notify?",NOTIFICATION));
 		layer1.add(new InfoObj("repeat?",REPEAT));
-		layer1.add(new InfoObj("weather?",WEATHER));
 		layer1.add(new InfoObj("search?",SEARCH));
 		lstAllData.add(layer1);
 	}
 
 	public void setData(NotificationData data) {
 		mData = data;
+		notifyDataSetChanged();
 	}
 
 	private class InfoObj {
@@ -68,13 +67,17 @@ public class OperationAdapter extends BaseAdapter {
 		}
 	}
 
-	public void fetchmore() {
+	public boolean fetchmore() {
 		if (mLayer < lstAllData.size()) {
 			mLayer++;
 			update();
+			return true;
 		}
+		return false;
 	}
-
+	public boolean hasMore() {
+		return mLayer<lstAllData.size();
+	}
 	public void update() {
 		lstData.clear();
 		for (int i = 0; i < mLayer; i++) {
@@ -116,8 +119,15 @@ public class OperationAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		Button btn = new Button(mCtxt);
+		Button btn = null;
+		if(convertView != null) {
+			btn = (Button) convertView;
+		}
+		else{
+			btn = new Button(mCtxt);
+		}
 		if (mData != null) {
+			LOG.D("NotificationData","list " +lstData.get(position).toString());
 			switch (lstData.get(position).id) {
 			case WHEN:
 				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.when)+str2 + mData.getWhen().getString()));
@@ -153,10 +163,7 @@ public class OperationAdapter extends BaseAdapter {
 				break;
 			case REPEAT:
 				btn.setText("" + mData.getRepeatCategory().getDesc());
-				break;			
-			case WEATHER:
-				btn.setText(lstData.get(position).content);
-				break;
+				break;		
 			case SEARCH:
 				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.search)+str2+mData.getWhat()));
 				break;
@@ -216,11 +223,13 @@ public class OperationAdapter extends BaseAdapter {
 		lstData.clear();
 	}
 
-	public void collapse() {
+	public boolean collapse() {
 		if (mLayer >= 1) {
 			mLayer--;
 			update();
+			return true;
 		}
+		return false;
 	}
 
 }

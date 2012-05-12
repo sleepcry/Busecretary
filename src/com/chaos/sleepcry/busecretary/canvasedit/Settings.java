@@ -67,7 +67,12 @@ public class Settings extends Activity {
 		mB.setText(String.valueOf(mColor&0xff));
 		int result = getIntent().getIntExtra(EXTRAS, SRC);
 		initSettings(result);
-		
+		mPb.postDelayed(new Runnable() {			
+			@Override
+			public void run() {
+				refresh();
+			}
+		},1000);
 	}
 	private void initSettings(int flags) {
 		mResult2 = flags & 0x3;
@@ -182,7 +187,13 @@ public class Settings extends Activity {
 		setResult(RESULT_OK, i);
 		this.finish();
 	}
-	
+	private void refresh() {
+		mPb.clear();
+		mColor = retrieveColor();
+		initLines(mColor);
+		mLine.setPaint(mResult1 | mResult2, mColor, 10);
+		mPb.invalidateAll();
+	}
 	public void onReset(View v) {
 		mResult1 = SRC;
 		mResult2 = 0;
@@ -266,11 +277,7 @@ public class Settings extends Activity {
 			break;
 		}
 		
-		mPb.clear();
-		mColor = retrieveColor();
-		initLines(mColor);
-		mLine.setPaint(mResult1 | mResult2, mColor, 10);
-		mPb.invalidateAll();
+		refresh();
 	}
 	private int retrieveColor() {
 		int color = mColor;

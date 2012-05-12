@@ -36,14 +36,14 @@ public enum RepeatCategory {
 				return null;
 		}
 	}
-	public List<String> toList(){
-		List<String> lstRet = new ArrayList<String>(); 
-		lstRet.add("none");
-		lstRet.add("every day");
-		lstRet.add("every month");
-		lstRet.add("every year");
-		lstRet.add("every hour");
-		lstRet.add("perid of time");
+	public static CharSequence[] toArray(){
+		CharSequence[] lstRet = new CharSequence[6]; 
+		lstRet[0] = "none";
+		lstRet[1] = "every day";
+		lstRet[2] = "every month";
+		lstRet[3] = "every year";
+		lstRet[4] = "every hour";
+		lstRet[5] = "perid of time";
 		return lstRet;
 	}
 }

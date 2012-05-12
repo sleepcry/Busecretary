@@ -3,35 +3,43 @@
 
     <item
         android:id="@+id/menurefresh"
-        android:title="@string/menurefresh">
+        android:title="@string/menurefresh"
+        android:icon="@drawable/refresh">
     </item>
     <item
         android:id="@+id/menulayer"
-        android:title="@string/menulayer">
+        android:title="@string/menulayer"
+        android:icon="@drawable/layers">
     </item>
     <item 
         android:id="@+id/menucolor"
-        android:title="@string/menucolor"/>
+        android:title="@string/menucolor"
+        android:icon="@drawable/colors"/>
     <item
         android:id="@+id/menuundo"
-        android:title="@string/menuundo">
+        android:title="@string/menuundo"
+        android:icon="@drawable/undo">
     </item>
     <item
         android:id="@+id/menuredo"
-        android:title="@string/menuredo">
+        android:title="@string/menuredo"
+        android:icon="@drawable/redo">
     </item>
     <item
         android:id="@+id/menuclear"
-        android:title="@string/menuclear">
+        android:title="@string/menuclear"
+        android:icon="@drawable/eraser">
     </item>
     
     <item
         android:id="@+id/menushare"
-        android:title="@string/menushare">
+        android:title="@string/menushare"
+        android:icon="@drawable/share">
     </item>
     <item
         android:id="@+id/menusetting"
-        android:title="@string/menusetting">
+        android:title="@string/menusetting"
+        android:icon="@drawable/settings">
     </item>
 
 </menu>
