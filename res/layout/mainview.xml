@@ -11,12 +11,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:visibility="gone" />
-    <com.google.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/admob_pub_id" />
     <ListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"

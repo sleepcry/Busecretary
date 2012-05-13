@@ -60,13 +60,25 @@ public abstract class Mydraw implements Comparable<Mydraw> {
 			}
 		}
 	}
+	public void recycle() {
+		
+	}
+	public void scaleTo(PointF center, float ratio) {
+
+	}
+	public void scaleBy(PointF center, float ratio) {
+
+	}
+
 	public Rect getBounds() {
 		int l = mParent.getLeft();
 		int t = mParent.getTop();
 		int r = mParent.getRight();
 		int b = mParent.getBottom();
-		return new Rect(l, t,(int)(l+(r-l)*DIV), (int)(t+(b-t)*DIV));
+		return new Rect(l, t, (int) (l + (r - l) * DIV), (int) (t + (b - t)
+				* DIV));
 	}
+
 	public PointF getAbsFromRel(PointF ptf) {
 		Rect bound = getBounds();
 		PointF ptf2 = new PointF();

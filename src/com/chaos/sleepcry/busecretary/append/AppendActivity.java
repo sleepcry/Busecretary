@@ -2,19 +2,24 @@ package com.chaos.sleepcry.busecretary.append;
 
 import java.util.Calendar;
 
+import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +33,7 @@ import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
-import com.google.ads.Ad;
-import com.google.ads.AdListener;
 import com.google.ads.AdRequest;
-import com.google.ads.AdRequest.ErrorCode;
-import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
 public class AppendActivity extends Activity implements ShakeShuffleListener {
@@ -43,11 +44,13 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	public static final String COLOR = "c";
 	public static final String LINE_WIDTH = "lw";
 	public static final String LINE_STYLE = "ls";
+	public static final String HINT = "hint";
 	public static final String SHAREPREF = "com.chaos.sleepcry.busecretary.append.AppendActivity";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		SmartMediaPlayer.initVolumeType(this);
 		setContentView(R.layout.append);
 		mPb = (PaintBoard) findViewById(R.id.canvas);
 		mPb.setPBListener(new PaintBoardListener() {
@@ -71,9 +74,13 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		});
 		mTitle = (TextView) findViewById(R.id.title);
 		this.registerForContextMenu(mPb);
-		mAppendPlayer = MediaPlayer.create(this, R.raw.append);
-		mClearPlayer = MediaPlayer.create(this, R.raw.clear);
-		mAlertPlayer = MediaPlayer.create(this, R.raw.nomatch);
+		mShakeShuffle = new ShakeShuffle(this);
+		mShakeShuffle.setShakeShuffleListener(this);
+		mAppendPlayer = SmartMediaPlayer.create(this, R.raw.append);
+		mClearPlayer = SmartMediaPlayer.create(this, R.raw.clear);
+		mAlertPlayer = SmartMediaPlayer.create(this, R.raw.nomatch);
+		AdView adView = (AdView) findViewById(R.id.adView);
+		adView.loadAd(new AdRequest());
 	}
 
 	private void edit() {
@@ -84,16 +91,17 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 				R.anim.zoom_fade_in);
 		mPb.recycle();
 	}
-	private MediaPlayer mAppendPlayer,mClearPlayer,mAlertPlayer;
+
+	private SmartMediaPlayer mAppendPlayer, mClearPlayer, mAlertPlayer;
+
 	public void ok(View v) {
 		String desc = mTitle.getText().toString();
-		if(desc == null || desc.length() == 0) {
+		if (desc == null || desc.length() == 0) {
 			mAlertPlayer.start();
-			new AlertDialog.Builder(this)
-			.setTitle(android.R.string.untitled)
-			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setMessage(R.string.titleUnspecified)
-			.setPositiveButton(android.R.string.ok, null).show();
+			new AlertDialog.Builder(this).setTitle(android.R.string.untitled)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setMessage(R.string.titleUnspecified)
+					.setPositiveButton(android.R.string.ok, null).show();
 			return;
 		}
 		Calendar cal = Calendar.getInstance();
@@ -103,7 +111,8 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		NotifyDatabase db = new NotifyDatabase(this, BusecretaryActivity.DB_VER);
 		mAppendPlayer.start();
 		db.insert(db.getMaxId() + 1, cal.getTimeInMillis(), desc,
-				data.getRing(), data.getRepeatCategory().getId(), mPb.toBitmap(),null);
+				data.getRing(), data.getRepeatCategory().getId(),
+				mPb.toBitmap(), null);
 		Toast.makeText(this, getString(R.string.autosave), Toast.LENGTH_SHORT)
 				.show();
 		mTitle.setText("");
@@ -113,6 +122,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		if (v.getId() == R.id.btn_clear) {
 			mClearPlayer.start();
 			mPb.clear();
+			mPb.invalidateAll();
 		}
 	}
 
@@ -150,6 +160,27 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		case R.id.menuedit:
 			edit();
 			return true;
+		case R.id.menuclear:
+			mPb.clear();
+			mPb.invalidateAll();
+			return true;
+		case R.id.menusetting:
+			new AlertDialog.Builder(this)
+			.setTitle(R.string.menusetting)
+			.setIcon(android.R.drawable.ic_menu_info_details)
+			.setMultiChoiceItems(R.array.settings,new boolean[] {need_hint},new OnMultiChoiceClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+					switch(which) {
+					case 0:
+						need_hint = isChecked;
+						dialog.dismiss();
+						break;
+					}
+				}
+			}).show();
+			return true;
 		}
 		return false;
 	}
@@ -163,9 +194,12 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 				MyDrawable mydraw = extras.getParcelable(PaintBoard.BACKGROUND);
 				mPb.clear();
 				mPb.add(mydraw);
+				mPb.invalidateAll();
 			}
 		}
 	}
+
+	private boolean need_hint = true;
 
 	protected void loadPrefs() {
 		SharedPreferences prefs = this.getSharedPreferences(SHAREPREF, 0);
@@ -184,18 +218,32 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 			int style = prefs.getInt(AppendActivity.LINE_STYLE, 0);
 			mPb.setPaint(style);
 		}
+		if (prefs.contains(AppendActivity.HINT)) {
+			need_hint = prefs.getBoolean(AppendActivity.HINT, true);
+		}
 	}
 
 	public void onResume() {
 		super.onResume();
 		loadPrefs();
-		mShakeShuffle = new ShakeShuffle(this);
-		mShakeShuffle.setShakeShuffleListener(this);
 		mShakeShuffle.start();
+		if (need_hint) {
+			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
+					R.drawable.hint);
+			mPb.setHint(new MyDrawable(new BitmapDrawable(bmp), new RectF(0, 0,
+					1, 1), 0, mPb));
+		}
+	}
+	protected void savePref() {
+		Editor editor = getSharedPreferences(AppendActivity.SHAREPREF, 0)
+				.edit();
+		editor.putBoolean(AppendActivity.HINT, need_hint);
+		editor.commit();
 	}
 
 	public void onPause() {
 		mShakeShuffle.pause();
+		savePref();
 		super.onPause();
 	}
 
@@ -213,7 +261,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	@Override
 	public void onShakeRight() {
 		mPb.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				mPb.redo();

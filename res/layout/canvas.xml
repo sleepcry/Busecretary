@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
-            android:hint="@string/temptext"
             android:maxHeight="200dp"
             android:scrollHorizontally="true"
             android:textColor="@color/white"
@@ -48,6 +47,16 @@
             android:contentDescription="@string/status"
             android:scaleType="fitXY"
             android:src="@drawable/paint" />
+        <!-- <TextView
+            android:id="@+id/hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/input"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:textSize="20dp"
+            android:visibility="gone" /> -->
     </FrameLayout>
 
     <SeekBar

@@ -1,5 +1,6 @@
 package com.chaos.sleepcry.busecretary.canvasedit;
 
+import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.AvoidXfermode;
@@ -53,6 +54,7 @@ public class Settings extends Activity {
 
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		SmartMediaPlayer.initVolumeType(this);
 		setContentView(R.layout.settings);
 		mPb = (PaintBoard) findViewById(R.id.surfaceView1);
 		mPb.setEditable(false);

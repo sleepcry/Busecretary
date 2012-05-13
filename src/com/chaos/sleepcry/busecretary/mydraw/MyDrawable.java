@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -38,6 +39,13 @@ public class MyDrawable extends Mydraw implements Parcelable {
 		mDrawPos = new RectF(0,0,1,1);
 	}
 	
+	public void recycle() {
+		Bitmap bmp = getBmp();
+		if(bmp != null) {
+			bmp.recycle();
+		}
+	}
+	
 	public String toString(){
 		if(mUrl==null||mUrl.length() == 0) {
 			return "image";
@@ -47,6 +55,25 @@ public class MyDrawable extends Mydraw implements Parcelable {
 	}
 	public void setBounds(RectF pos) {
 		mDrawPos = pos;
+	}
+	public void moveTo(PointF center) {
+		float w = mDrawPos.width()/2;
+		float h = mDrawPos.height()/2;
+		mDrawPos.left = center.x - w;
+		mDrawPos.right = center.x + w;
+		mDrawPos.top = center.y - h;
+		mDrawPos.bottom = center.y + h;
+	}
+	public void scaleTo(float ratio) {
+		scaleBy(1f-ratio);
+	}
+	public void scaleBy(float ratio) {
+		float w = mDrawPos.width()*ratio/2;
+		float h = mDrawPos.height()*ratio/2;
+		mDrawPos.left += w;
+		mDrawPos.right -= w;
+		mDrawPos.top += h;
+		mDrawPos.bottom -= h;
 	}
 	public Bitmap getBmp() {
 		return mDrawable!=null?mDrawable.getBitmap():null;

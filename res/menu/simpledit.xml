@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/menuedit"
+    <item
+        android:id="@+id/menuedit"
+        android:icon="@drawable/pencil"
         android:title="@string/menuedit"
-        android:visible="true"
-        android:icon="@drawable/pencil"></item>
-    <item android:id="@+id/menuundo"
-        android:title="@string/menuundo"
-        android:icon="@drawable/undo"></item>
-    <item android:id="@+id/menuredo"
-        android:title="@string/menuredo"
-        android:icon="@drawable/redo"></item>
-
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/menuundo"
+        android:icon="@drawable/undo"
+        android:title="@string/menuundo">
+    </item>
+    <item
+        android:id="@+id/menuredo"
+        android:icon="@drawable/redo"
+        android:title="@string/menuredo">
+    </item>
+    <item
+        android:id="@+id/menusetting"
+        android:icon="@drawable/settings"
+        android:title="@string/menusetting">
+    </item>
+    <item
+        android:id="@+id/menuclear"
+        android:icon="@drawable/eraser"
+        android:title="@string/menuclear">
+    </item>
+    <item/>
 </menu>

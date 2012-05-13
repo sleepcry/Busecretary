@@ -9,6 +9,8 @@ import java.util.Locale;
 
 import utils.LOG;
 import utils.MathUtils;
+import utils.SmartMediaPlayer;
+import android.R.integer;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -45,7 +47,8 @@ import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
 import com.chaos.sleepcry.busecretary.notify.NotifyReceiver;
 
-public class BusecretaryActivity extends Activity implements OnClickListener {
+public class BusecretaryActivity extends Activity implements OnClickListener,
+		OnTouchListener {
 
 	private TextView mTitleDesc = null;
 	private ProgressBar mPbPregress = null;
@@ -94,6 +97,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		SmartMediaPlayer.initVolumeType(this);
 		mCur = new MainView(this);
 		mNext = new MainView(this);
 		mPrevious = new MainView(this);
@@ -124,13 +128,30 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		}
 		mTitleDesc = (TextView) this.findViewById(R.id.tv_title);
 		mDB = new NotifyDatabase(this, DB_VER);
+
+		mGeocoder = new Geocoder(this, Locale.getDefault());
+		mPosDown = new Point(-1, -1);
+		mPosCur = new Point(-1, -1);
+		mPosPre = new Point(-1, -1);
+		View v = new View(this, null, 0);
+		v.setOnTouchListener(this);
+		this.addContentView(v, new LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
+		initNotif();
+	}
+
+	protected void onNewIntent(Intent intent) {
+		initNotif();
+	}
+
+	private void initNotif() {
 		mLstNotis = mDB.query(System.currentTimeMillis());
 		if (mLstNotis != null)
 			Collections.sort(mLstNotis);
-		mGeocoder = new Geocoder(this, Locale.getDefault());
 		/*
-		 * if the list has not been built if gotten nothing from the
-		 * database,the first time run this program,for example.
+		 * if get nothing from the database,the first time run this program,for
+		 * example.
 		 */
 		if (mLstNotis == null) {
 			mLstNotis = new ArrayList<NotificationData>();
@@ -146,112 +167,16 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			}
 			switchNotif(mCurNoti);
 		}
-		notifyUI(null, mCurNoti, null);
-		mPosDown = new Point(-1, -1);
-		mPosCur = new Point(-1, -1);
-		mPosPre = new Point(-1, -1);
-		View v = new View(this, null, 0);
-		v.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent motion) {
-				if (mCurNoti == null)
-					return false;
-				boolean bret = mCur.dispatchTouchEvent(motion);
-				if (motion.getPointerCount() > 1) {
-					return bret;
-				}
-				int action = motion.getAction();
-				switch (action) {
-				case MotionEvent.ACTION_DOWN:
-					mPosDown.set((int) motion.getX(), (int) motion.getY());
-					mPosCur.set((int) motion.getX(), (int) motion.getY());
-					mPosPre.set((int) motion.getX(), (int) motion.getY());
-					mTotalOffset = 0;
-					is_horizontal_move = false;
-					is_vertical_move = false;
-					break;
-				case MotionEvent.ACTION_UP:
-					mPosCur.set((int) motion.getX(), (int) motion.getY());
-					if (is_vertical_move) {
-						int half = BusecretaryActivity.this.getWindowManager()
-								.getDefaultDisplay().getHeight() / 2;
-						if (mPosCur.y > half && mPosDown.y < half) {
-							mCur.collapse();
-						}
-						LOG.D("sensitivity", "vertical commit");
-					} else if (is_horizontal_move) {
-						LOG.D("sensitivity", "horizontal commit");
-						// if (!canMoveHorizontal(motion.getX())) {
-						// break;
-						// }
-						int mode = ROLLBACK;
-						if (motion.getEventTime() - motion.getDownTime() <= 100) {
-
-							if (mPosDown.x - mPosCur.x >= 100) {
-								// move to previous
-								moveNext();
-								mode = COMMIT_NEXT;
-							} else if (mPosCur.x - mPosDown.x >= 100) {
-								// move to next
-								movePrevious();
-								mode = COMMIT_PREVIOUS;
-							}
-						} else if (mTotalOffset > 0
-								&& mTotalOffset > Math
-										.min(mWidthPixel / 2, 200)) {
-							// move to next
-							movePrevious();
-							mode = COMMIT_PREVIOUS;
-						} else if (mTotalOffset < 0
-								&& mTotalOffset < -Math.min(mWidthPixel / 2,
-										200)) {
-							// move to previous
-							moveNext();
-							mode = COMMIT_NEXT;
-						}
-						// roll back
-						commitTranslate(mode);
-						if (mPosDown.x - mPosCur.x >= 10) {
-							motion.setAction(MotionEvent.ACTION_CANCEL);
-						}
-					}
-					mTotalOffset = 0;
-					break;
-				case MotionEvent.ACTION_MOVE:
-					mPosCur.set((int) motion.getX(), (int) motion.getY());
-					// if (!canMoveHorizontal(motion.getX())) {
-					// break;
-					// }
-					if (!is_vertical_move && !is_horizontal_move) {
-						if (MathUtils.dst(
-								new PointF(motion.getX(), motion.getY()),
-								new PointF(mPosDown.x, mPosDown.y)) >= MOVE_SENSITIVITY) {
-							double orientation2 = Math.abs(MathUtils
-									.getOrientation(mPosDown, mPosCur));
-							if (orientation2 >= Math.PI / 3) {
-								is_vertical_move = true;
-								LOG.D("sensitivity", "vertical move");
-							} else if (orientation2 <= Math.PI / 6 && canMoveHorizontal(motion.getX())) {
-								is_horizontal_move = true;
-								LOG.D("sensitivity", "horizontal move");
-							}
-						}
-					}
-					if (is_horizontal_move) {
-						translate(mPosCur.x - mPosPre.x);
-						mTotalOffset += mPosCur.x - mPosPre.x;
-						mPosPre.set(mPosCur.x, mPosCur.y);
-					}
-					break;
-				}
-				return true;
-			}
-
-		});
-		this.addContentView(v, new LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT));
-
+		int index = mLstNotis.indexOf(mCurNoti);
+		NotificationData pre = null;
+		NotificationData next = null;
+		if (index >= 1) {
+			pre = mLstNotis.get(index - 1);
+		}
+		if (index < mLstNotis.size() - 1) {
+			next = mLstNotis.get(index + 1);
+		}
+		notifyUI(pre, mCurNoti, next);
 	}
 
 	public boolean canMoveHorizontal(float x) {
@@ -315,7 +240,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		} else if (curIndex > 0) {
 			// there are more at left, move left
 			NotificationData data = mLstNotis.get(mCurNoti.getLocation() - 1);
-			switchNotif(data);
 			mDB.delete(mCurNoti.getId());
 			mCurNoti = null;
 			switchNotif(data);
@@ -326,6 +250,99 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 			mCurNoti = null;
 			commitTranslate(ROLLBACK);
 		}
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent motion) {
+		if (mCurNoti == null)
+			return false;
+		boolean bret = mCur.dispatchTouchEvent(motion);
+		if (motion.getPointerCount() > 1) {
+			return bret;
+		}
+		int action = motion.getAction();
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:
+			mPosDown.set((int) motion.getX(), (int) motion.getY());
+			mPosCur.set((int) motion.getX(), (int) motion.getY());
+			mPosPre.set((int) motion.getX(), (int) motion.getY());
+			mTotalOffset = 0;
+			is_horizontal_move = false;
+			is_vertical_move = false;
+			break;
+		case MotionEvent.ACTION_UP:
+			mPosCur.set((int) motion.getX(), (int) motion.getY());
+			if (is_vertical_move) {
+				int half = BusecretaryActivity.this.getWindowManager()
+						.getDefaultDisplay().getHeight() / 2;
+				if (mPosCur.y > half && mPosDown.y < half) {
+					mCur.collapse();
+				}
+				LOG.D("sensitivity", "vertical commit");
+			} else if (is_horizontal_move) {
+				LOG.D("sensitivity", "horizontal commit");
+				// if (!canMoveHorizontal(motion.getX())) {
+				// break;
+				// }
+				int mode = ROLLBACK;
+				if (motion.getEventTime() - motion.getDownTime() <= 100) {
+
+					if (mPosDown.x - mPosCur.x >= 100) {
+						// move to previous
+						moveNext();
+						mode = COMMIT_NEXT;
+					} else if (mPosCur.x - mPosDown.x >= 100) {
+						// move to next
+						movePrevious();
+						mode = COMMIT_PREVIOUS;
+					}
+				} else if (mTotalOffset > 0
+						&& mTotalOffset > Math.min(mWidthPixel / 2, 200)) {
+					// move to next
+					movePrevious();
+					mode = COMMIT_PREVIOUS;
+				} else if (mTotalOffset < 0
+						&& mTotalOffset < -Math.min(mWidthPixel / 2, 200)) {
+					// move to previous
+					moveNext();
+					mode = COMMIT_NEXT;
+				}
+				// roll back
+				commitTranslate(mode);
+				if (mPosDown.x - mPosCur.x >= 10) {
+					motion.setAction(MotionEvent.ACTION_CANCEL);
+				}
+			}
+			mTotalOffset = 0;
+			break;
+		case MotionEvent.ACTION_MOVE:
+			mPosCur.set((int) motion.getX(), (int) motion.getY());
+			// if (!canMoveHorizontal(motion.getX())) {
+			// break;
+			// }
+			if (!is_vertical_move && !is_horizontal_move) {
+				if (MathUtils.dst(new PointF(motion.getX(), motion.getY()),
+						new PointF(mPosDown.x, mPosDown.y)) >= MOVE_SENSITIVITY) {
+					double orientation2 = Math.abs(MathUtils.getOrientation(
+							mPosDown, mPosCur));
+					if (orientation2 >= Math.PI / 3) {
+						is_vertical_move = true;
+						LOG.D("sensitivity", "vertical move");
+					} else if (orientation2 <= Math.PI / 6
+							&& canMoveHorizontal(motion.getX())) {
+						is_horizontal_move = true;
+						LOG.D("sensitivity", "horizontal move");
+					}
+				}
+			}
+			if (is_horizontal_move) {
+				translate(mPosCur.x - mPosPre.x);
+				mTotalOffset += mPosCur.x - mPosPre.x;
+				mPosPre.set(mPosCur.x, mPosCur.y);
+			}
+			break;
+		}
+		return true;
 	}
 
 	@Override
@@ -522,13 +539,18 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 
 	public void onDestroy() {
 		super.onDestroy();
+		mNext.destroy();
+		mCur.destroy();
+		mPrevious.destroy();
 		if (mCurNoti != null) {
 			switchNotif(null);
-			for (int i = 0; i < mLstNotis.size(); i++) {
-				mLstNotis.get(i).setBmp(null);
+			if (mCurNoti.getBmp() != null) {
+				mCurNoti.getBmp().recycle();
 			}
-			mCurNoti.setBmp(null);
+			mCurNoti = null;
 		}
+
+		mLstNotis.clear();
 		System.gc();
 	}
 
@@ -597,7 +619,6 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		mCur.notifyUI(data);
 		mPrevious.notifyUI(pre);
 		mNext.notifyUI(next);
-		mCur.setData(mCurNoti);
 		LOG.logMem(this);
 	}
 
@@ -612,7 +633,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 	}
 
 	protected void updateUI() {
-		notifyUI(null, mCurNoti, null);
+		notifyUI(mPrevious.getData(), mCurNoti, mNext.getData());
 	}
 
 	public boolean moveNext() {
@@ -678,17 +699,23 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		translate(commitOffset, 300, effect);
 		// update the UI with new data
 		NotificationData pre = null;
+		NotificationData beforepre = null;
+		NotificationData afternext = null;
 		NotificationData next = null;
 		if (mCurNoti != null) {
 			int location = mCurNoti.getLocation();
 			if (location - 1 >= 0) {
 				pre = mLstNotis.get(location - 1);
 			}
+			if (location - 2 >= 0) {
+				beforepre = mLstNotis.get(location - 2);
+			}
+
 			if (location < mLstNotis.size()) {
 				next = mLstNotis.get(location);
-			} else {
-				next = new NotificationData(mCurNoti.getId() + 1,
-						mCurNoti.getLocation() + 1);
+			}
+			if (location < mLstNotis.size() - 1) {
+				afternext = mLstNotis.get(location + 1);
 			}
 		}
 		/*
@@ -696,13 +723,15 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		 */
 		switch (mode) {
 		case COMMIT_NEXT:
-			if (next != null) {
-				next.setBmp(null);
+			if (beforepre != null && beforepre.getBmp() != null) {
+				beforepre.getBmp().recycle();
+				beforepre.setBmp(null);
 			}
 			break;
 		case COMMIT_PREVIOUS:
-			if (pre != null) {
-				pre.setBmp(null);
+			if (afternext != null && afternext.getBmp() != null) {
+				afternext.getBmp().recycle();
+				afternext.setBmp(null);
 			}
 			break;
 		}
@@ -736,6 +765,17 @@ public class BusecretaryActivity extends Activity implements OnClickListener {
 		mCur.pause();
 		mPrevious.pause();
 		mNext.pause();
+		// mNext.reset();
+		// mCur.reset();
+		// mPrevious.reset();
+		// if (mCurNoti != null) {
+		// switchNotif(null);
+		// mCurNoti.getBmp().recycle();
+		// mCurNoti = null;
+		// }
+		//
+		// mLstNotis.clear();
+		// System.gc();
 	}
 
 	public void onCreateContextMenu(ContextMenu cm, View v,

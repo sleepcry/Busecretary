@@ -1,5 +1,6 @@
 package com.chaos.sleepcry.busecretary.mydraw;
 
+import utils.LOG;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -21,7 +22,6 @@ public class ShakeShuffle implements SensorEventListener {
 	public void pause() {
 		if (sensorMgr != null) {
 			sensorMgr.unregisterListener(this);
-			sensorMgr = null;
 		}
 	}
 
@@ -29,9 +29,8 @@ public class ShakeShuffle implements SensorEventListener {
 		if (!sensorMgr.registerListener(this, mAccSensor,
 				SensorManager.SENSOR_DELAY_GAME)) {
 			sensorMgr.unregisterListener(this);
-			sensorMgr = null;
-			return;
 		}
+		LOG.D("music","start");
 	}
 
 	public static interface ShakeShuffleListener {
@@ -62,8 +61,8 @@ public class ShakeShuffle implements SensorEventListener {
 				if ((Math.abs(values[0]) < Math.abs(values[1]) || (Math
 						.abs(values[0]) < Math.abs(values[2])))) {
 					free_frame_cnt++;
-					// clear status every 0.7 seconds
-					if (free_frame_cnt >= 5) {
+					// clear status every 0.3 seconds
+					if (free_frame_cnt >= 3) {
 						mDirection = Direction.UNDETERMINED;
 						free_frame_cnt = 0;
 					}

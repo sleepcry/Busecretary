@@ -56,7 +56,9 @@ public class OperationAdapter extends BaseAdapter {
 		mData = data;
 		notifyDataSetChanged();
 	}
-
+	public NotificationData getData() {
+		return mData;
+	}
 	private class InfoObj {
 		public String content;
 		public int id;
@@ -220,6 +222,7 @@ public class OperationAdapter extends BaseAdapter {
 
 	public void reset() {
 		mLayer = 0;
+		mData = null;
 		lstData.clear();
 	}
 
@@ -231,5 +234,7 @@ public class OperationAdapter extends BaseAdapter {
 		}
 		return false;
 	}
+
+	
 
 }

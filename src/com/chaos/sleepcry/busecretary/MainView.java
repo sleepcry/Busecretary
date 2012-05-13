@@ -6,19 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import utils.LOG;
+import utils.SmartMediaPlayer;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
@@ -30,8 +29,6 @@ import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
-import com.google.ads.AdRequest;
-import com.google.ads.AdView;
 
 public class MainView extends LinearLayout {
 	/*
@@ -82,11 +79,9 @@ public class MainView extends LinearLayout {
 		 * @}
 		 */
 		mAnimation = new PaneAnimation(0);
-		mCollapsePlayer = MediaPlayer.create(context, R.raw.waterdrop);
-		mExpandPlayer = MediaPlayer.create(context, R.raw.waterdrop);
-		mDockPlayer = MediaPlayer.create(context, R.raw.dock);
-		AdView adView = (AdView) findViewById(R.id.adView);
-		adView.loadAd(new AdRequest());
+		mCollapsePlayer = SmartMediaPlayer.create(context, R.raw.waterdrop);
+		mExpandPlayer = SmartMediaPlayer.create(context, R.raw.waterdrop);
+		mDockPlayer = SmartMediaPlayer.create(context, R.raw.dock);
 	}
 
 	public void setData(NotificationData data) {
@@ -101,7 +96,9 @@ public class MainView extends LinearLayout {
 			mAdapter.setData(data);
 		}
 	}
-
+	public NotificationData getData() {
+		return mAdapter.getData();
+	}
 	public PaintBoard getPaintBoard() {
 		return mPb;
 	}
@@ -163,15 +160,19 @@ public class MainView extends LinearLayout {
 	}
 
 	public void reset() {
-		// setWhat("");
 		mAdapter.reset();
-//		mAdapter.notifyDataSetChanged();
 		mList.invalidateViews();
 		mList.removeFooterView(mMore);
 		mList.addFooterView(mMore);
 	}
+	public void destroy() {
+		mList.setAdapter(null);
+		mAdapter.reset();
+		mPb.destroy();
+	}
 
 	public void notifyUI(NotificationData data) {
+		setData(data);
 		if (data == null) {
 			return;
 		}
@@ -227,6 +228,7 @@ public class MainView extends LinearLayout {
 		}
 		// image
 		if (data.getBmp() == null) {
+			mPb.clear();
 			LOG.D("memory", "bmp path:" + data.getBmpPath());
 			String path = data.getBmpPath();
 			if (path != null && path.length() > 0) {
@@ -236,29 +238,27 @@ public class MainView extends LinearLayout {
 					FileInputStream fis = new FileInputStream(file);
 					BitmapFactory.Options opts = new BitmapFactory.Options();
 					opts.inJustDecodeBounds = false;
-					opts.inSampleSize = 4;
+//					opts.inSampleSize = 4;
 					Bitmap bmp = BitmapFactory.decodeStream(fis, null, opts);
 					LOG.D("memory", "bitmap bounds:" + opts.outWidth + ","
 							+ opts.outHeight);
 					MyDrawable mydraw = new MyDrawable(new BitmapDrawable(bmp),
 							new RectF(0, 0, 1, 1), 0, mPb);
 					data.setBmp(bmp);
-					mPb.clear();
 					mPb.add(mydraw);
-					mPb.invalidate();
 					fis.close();
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException ioe) {
-
+					ioe.printStackTrace();
 				}
-
+			}else {
+				mPb.invalidateAll();
 			}
 		}
 	}
 
-	private MediaPlayer mCollapsePlayer, mExpandPlayer, mDockPlayer;
+	private SmartMediaPlayer mCollapsePlayer, mExpandPlayer, mDockPlayer;
 
 	public void collapse() {
 		if (mAdapter.collapse()) {
@@ -300,5 +300,7 @@ public class MainView extends LinearLayout {
 		}
 		return null;
 	}
+
+	
 
 }

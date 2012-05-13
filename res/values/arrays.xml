@@ -26,5 +26,9 @@
         <item>image</item>
         <item>text</item>
     </string-array>
+    
+    <string-array name="settings">
+        <item>need any hint for the available operation?</item>
+    </string-array>
 
 </resources>
