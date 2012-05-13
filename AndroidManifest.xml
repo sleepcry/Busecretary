@@ -48,7 +48,7 @@
                 <action android:name="com.chaos.sleepcry.PREVIOUS" />
             </intent-filter>
         </receiver>
-        <receiver
+        <!-- <receiver
             android:name="com.chaos.sleepcry.busecretary.widget.BsWidget"
             android:icon="@drawable/todo4" >
             <meta-data
@@ -58,7 +58,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-        </receiver>
+        </receiver> -->
         <activity
             android:name=".canvasedit.Settings"
             android:windowSoftInputMode="adjustPan" >

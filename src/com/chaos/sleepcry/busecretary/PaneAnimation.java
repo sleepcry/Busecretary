@@ -2,7 +2,6 @@ package com.chaos.sleepcry.busecretary;
 
 import android.graphics.Camera;
 import android.graphics.Matrix;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 

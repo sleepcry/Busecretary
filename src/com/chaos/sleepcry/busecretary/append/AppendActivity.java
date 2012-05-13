@@ -81,6 +81,13 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		mAlertPlayer = SmartMediaPlayer.create(this, R.raw.nomatch);
 		AdView adView = (AdView) findViewById(R.id.adView);
 		adView.loadAd(new AdRequest());
+
+		if (need_hint) {
+			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
+					R.drawable.hint);
+			mPb.setHint(new MyDrawable(new BitmapDrawable(bmp), new RectF(0, 0,
+					1, 1), 0, mPb));
+		}
 	}
 
 	private void edit() {
@@ -227,12 +234,6 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		super.onResume();
 		loadPrefs();
 		mShakeShuffle.start();
-		if (need_hint) {
-			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
-					R.drawable.hint);
-			mPb.setHint(new MyDrawable(new BitmapDrawable(bmp), new RectF(0, 0,
-					1, 1), 0, mPb));
-		}
 	}
 	protected void savePref() {
 		Editor editor = getSharedPreferences(AppendActivity.SHAREPREF, 0)
@@ -244,6 +245,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	public void onPause() {
 		mShakeShuffle.pause();
 		savePref();
+		mPb.clearHint();
 		super.onPause();
 	}
 

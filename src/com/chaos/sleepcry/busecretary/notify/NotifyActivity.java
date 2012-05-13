@@ -12,22 +12,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.chaos.sleepcry.busecretary.R;
-import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 
 public class NotifyActivity extends Activity implements OnClickListener{
 	private MediaPlayer mPlayer = null;	//player to play the notification rings

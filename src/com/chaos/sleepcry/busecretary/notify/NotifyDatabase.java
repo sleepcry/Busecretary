@@ -1,13 +1,9 @@
 package com.chaos.sleepcry.busecretary.notify;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -19,11 +15,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore.Images.Media;
 
 import com.chaos.sleepcry.busecretary.Day;
-import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.RepeatCategory;
 
 public class NotifyDatabase extends SQLiteOpenHelper {

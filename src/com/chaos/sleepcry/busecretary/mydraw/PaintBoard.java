@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import utils.SmartMediaPlayer;
-import android.R.integer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -27,7 +26,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.WindowManager;
 
 import com.chaos.sleepcry.busecretary.R;
 

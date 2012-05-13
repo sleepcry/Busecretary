@@ -1,8 +1,5 @@
 package com.chaos.sleepcry.busecretary;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum RepeatCategory {
 	NONE(1,"none"),EVERYDAY(2,"every day"),EVERYMONTH(3,"every month"),EVERYYEAR(4,"every year"),
 	EVERYHOUR(5,"every hour"),LAST(6,"perid of time");

@@ -2,10 +2,7 @@ package com.chaos.sleepcry.busecretary.colorpalette;
 
 import java.util.ArrayList;
 
-import android.R.integer;
 import android.content.Context;
-import android.graphics.Color;
-import android.telephony.CellLocation;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;

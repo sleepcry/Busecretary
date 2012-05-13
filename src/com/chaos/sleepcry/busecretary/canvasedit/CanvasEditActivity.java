@@ -2,7 +2,6 @@ package com.chaos.sleepcry.busecretary.canvasedit;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -73,7 +72,6 @@ import com.chaos.sleepcry.busecretary.colorpalette.ColorPalette.OnColorChangedLi
 import com.chaos.sleepcry.busecretary.colorpalette.ColorPickerDialog;
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.MyText;
-import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
@@ -362,8 +360,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 	protected boolean assign2Overlay(MotionEvent motion) {
 		if (mStatus.flags == ContentStatus.PUT_IMAGE) {
 			if(mCurrentDrawable == null) {
-				mStatus.beginPutImage();		
-				hideHint();		
+				mStatus.beginPutImage();			
 			}
 		} else if (mStatus.flags == ContentStatus.PUT_TEXT) {
 			if (mTempText.getVisibility() == View.VISIBLE) {
@@ -377,8 +374,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 				return true;
 			}
 			if(mCurrentText == null) {
-				mStatus.beginPutText();		
-				hideHint();		
+				mStatus.beginPutText();			
 			}
 		}
 		return false;
@@ -845,6 +841,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mPb.startDrawTemp(draw);
 			mPb.drawTemp();
 			mTempView.setVisibility(View.GONE);
+			hideHint();
 		}
 
 		public void beginPutText() {
@@ -856,6 +853,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mPb.startDrawTemp(draw);
 			mPb.drawTemp();
 			mTempView.setVisibility(View.GONE);
+			hideHint();
 		}
 
 		public void endPutContent() {
@@ -923,6 +921,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 	public void onPause() {
 		savePref();
 		mShakeShuffle.pause();
+		mPb.clearHint();
 		super.onPause();
 	}
 

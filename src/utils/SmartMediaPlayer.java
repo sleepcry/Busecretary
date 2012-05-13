@@ -1,7 +1,5 @@
 package utils;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;

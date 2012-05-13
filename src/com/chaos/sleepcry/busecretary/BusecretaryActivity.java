@@ -10,7 +10,6 @@ import java.util.Locale;
 import utils.LOG;
 import utils.MathUtils;
 import utils.SmartMediaPlayer;
-import android.R.integer;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -376,12 +375,21 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 				break;
 			// where
 			case OperationAdapter.WHERE:
-				Intent whereIntent = new Intent();
-				whereIntent.setAction(Intent.ACTION_GET_CONTENT);
-				whereIntent.addCategory(Intent.CATEGORY_DEFAULT);
-				whereIntent.addCategory(Intent.CATEGORY_OPENABLE);
-				whereIntent.setData(Uri.parse("geo://weiz.mobi/"));
-				startActivityForResult(whereIntent, OperationAdapter.WHERE);
+				try {
+					Intent whereIntent = new Intent();
+					whereIntent.setAction(Intent.ACTION_GET_CONTENT);
+					whereIntent.addCategory(Intent.CATEGORY_DEFAULT);
+					whereIntent.addCategory(Intent.CATEGORY_OPENABLE);
+					whereIntent.setData(Uri.parse("geo://weiz.mobi/"));
+					startActivityForResult(whereIntent, OperationAdapter.WHERE);
+				} catch (Exception e) {
+					new AlertDialog.Builder(this)
+					.setTitle(android.R.string.dialog_alert_title)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setMessage(R.string.noweiz).show();
+//					Uri uri = Uri.parse("market://details?id=com.chaoslab.locationshare");
+				}
+
 				break;
 			// ring
 			case OperationAdapter.NOTIFICATION:
