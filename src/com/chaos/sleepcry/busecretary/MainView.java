@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import utils.LOG;
-import utils.SmartMediaPlayer;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +28,9 @@ import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
 import com.chaos.sleepcry.busecretary.mydraw.Mydraw;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
+import com.chaos.sleepcry.busecretary.utils.LOG;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
+import com.chaos.sleepcry.busecretary.utils.TimeUtils;
 
 public class MainView extends LinearLayout {
 	/*
@@ -37,6 +39,7 @@ public class MainView extends LinearLayout {
 	private ListView mList = null;
 	PaintBoard mPb = null;
 	View mEmptyView = null;
+	TimeUtils mMyUtils = null;
 	/*
 	 * @}
 	 */
@@ -48,6 +51,7 @@ public class MainView extends LinearLayout {
 	public MainView(BusecretaryActivity context) {
 		super(context);
 		mMainFrm = context;
+		mMyUtils = new TimeUtils(context);
 		LayoutInflater.from(context).inflate(R.layout.mainview, this, true);
 		/*
 		 * @{ initialize all view components
@@ -170,7 +174,16 @@ public class MainView extends LinearLayout {
 		mAdapter.reset();
 		mPb.destroy();
 	}
-
+	public String getDescription(NotificationData data) {
+		String ret = new TimeUtils(mMainFrm).generalString(data.getWhen());
+		if(data.getWhere() != null) {
+			ret += "\n" + data.getWhere();
+		}
+		if(data.getWhat() != null) {
+			ret += "\n" + data.getWhat();
+		}
+		return ret;
+	}
 	public void notifyUI(NotificationData data) {
 		setData(data);
 		if (data == null) {
@@ -185,7 +198,7 @@ public class MainView extends LinearLayout {
 		if (mBtnDateDesc != null) {
 			mBtnDateDesc.setText(Html.fromHtml(str1
 					+ mMainFrm.getString(R.string.when) + str2
-					+ data.getWhen().getString()));
+					+ mMyUtils.timeString(data.getWhen())));
 		}
 		// where
 		setWhere(Html.fromHtml(str1 + mMainFrm.getString(R.string.where) + str2

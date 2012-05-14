@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import utils.SmartMediaPlayer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -27,7 +26,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
+import com.chaos.sleepcry.busecretary.GlobalSettings;
 import com.chaos.sleepcry.busecretary.R;
+import com.chaos.sleepcry.busecretary.canvasedit.Settings;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
 
 public class PaintBoard extends View implements OnTouchListener {
 	// all things need to draw on the canvas
@@ -64,7 +66,8 @@ public class PaintBoard extends View implements OnTouchListener {
 		this.setOnTouchListener(this);
 		mCurColor = Color.WHITE;
 		bEditable = true;
-		mLineWidth = 3;
+		mLineWidth = GlobalSettings.MIN_LINEWIDTH;
+		mLineFlag = Settings.SRC|Settings.BLUR;
 		mPaint = new Paint(Paint.DITHER_FLAG);
 		mTouchPlayer = SmartMediaPlayer.create(mContext, R.raw.waterdrop);
 		mRedoPlayer = SmartMediaPlayer.create(mContext, R.raw.redo);

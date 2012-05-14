@@ -3,7 +3,9 @@
     <item android:id="@+id/remove"
         android:title="@string/remove"
         android:icon="@drawable/remove"/>
-    <item android:id="@+id/config"
-        android:title="@string/config"
-        android:icon="@drawable/settings"/>
+    <item
+        android:id="@+id/menushare"
+        android:title="@string/menushare"
+        android:icon="@drawable/share">
+    </item>
 </menu>

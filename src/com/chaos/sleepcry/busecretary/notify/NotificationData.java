@@ -1,15 +1,11 @@
 package com.chaos.sleepcry.busecretary.notify;
 
-import java.util.Calendar;
-
 import android.graphics.Bitmap;
-
-import com.chaos.sleepcry.busecretary.Day;
 import com.chaos.sleepcry.busecretary.RepeatCategory;
 
 public class NotificationData implements Comparable<NotificationData> {
 	private int mId;
-	private Day mDay;
+	private long mTime;
 	private String mDesc;
 	private String mRing;
 	private RepeatCategory mCategory;
@@ -23,9 +19,7 @@ public class NotificationData implements Comparable<NotificationData> {
 
 	public NotificationData(int id, int loc) {
 		setId(id);
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(System.currentTimeMillis());
-		mDay = new Day(cal);
+		mTime = System.currentTimeMillis();
 		mDesc = new String("");
 		mRing = null;
 		mCategory = RepeatCategory.NONE;
@@ -68,21 +62,24 @@ public class NotificationData implements Comparable<NotificationData> {
 		return mDesc;
 	}
 
-	public void setWhen(Day mDay) {
-		this.mDay = mDay;
+	public void setWhen(long time) {
+		this.mTime = time;
 	}
 
-	public Day getWhen() {
-		return mDay;
+	public long getWhen() {
+		return mTime;
 	}
 
 	public void setId(int mId) {
 		this.mId = mId;
 	}
+
 	private String mWhereString = null;
+
 	public void setWhere(String where) {
 		mWhereString = where;
 	}
+
 	public String getWhere() {
 		return mWhereString;
 	}
@@ -112,7 +109,6 @@ public class NotificationData implements Comparable<NotificationData> {
 
 	@Override
 	public int compareTo(NotificationData another) {
-		return (int) (another.mDay.getCalendar().getTimeInMillis() - mDay
-				.getCalendar().getTimeInMillis());
+		return (int) (another.mTime - mTime);
 	}
 }

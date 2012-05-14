@@ -1,6 +1,7 @@
 package com.chaos.sleepcry.busecretary.mydraw;
 
-import utils.LOG;
+import com.chaos.sleepcry.busecretary.utils.LOG;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

@@ -38,5 +38,14 @@
             android:text="delay"
             android:textSize="20dp" 
             android:layout_weight="1"/>
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="cancel"
+            android:textSize="20dp" 
+            android:layout_weight="1"
+            android:visibility="gone"/>
     </LinearLayout>
 </RelativeLayout>

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import utils.LOG;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,14 +16,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.provider.MediaStore.Images.Media;
 
-import com.chaos.sleepcry.busecretary.Day;
 import com.chaos.sleepcry.busecretary.RepeatCategory;
+import com.chaos.sleepcry.busecretary.utils.LOG;
 
 public class NotifyDatabase extends SQLiteOpenHelper {
 
 	private static final String TBL_NAME = "bs_db"; // the table name
 	private static final String CURRENT_RECORD = "cur_rcd"; // the table name
-	private static final String ID = "id"; // the column name of the id
+	public static final String ID = "id"; // the column name of the id
 	public static final int MODE_NEXT = 1;
 	public static final int MODE_PREVIOUS = -1;
 	public static final String WHAT = "desc";
@@ -88,8 +87,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			// write old data to new one
 			for (int i = 0; existent!= null&&i < existent.size(); i++) {
 				NotificationData data = existent.get(i);
-				insert(data.getId(), data.getWhen().getCalendar()
-						.getTimeInMillis(), data.getWhat(), data.getRing(),
+				insert(data.getId(), data.getWhen(), data.getWhat(), data.getRing(),
 						data.getRepeatCategory().getId(), null, data.getWhere(),db);
 				ContentValues cv = new ContentValues();
 				cv.put(BMP, data.getBmpPath());
@@ -134,12 +132,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			} catch (IOException e) {
 				LOG.W("ExternalStorage", "Error writing " + file);
 			}
-			try {
-				Media.insertImage(mContext.getContentResolver(),
-						file.getAbsolutePath(), file.getName(), file.getName());
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+			
 			cv.put(BMP, file.getAbsolutePath());
 		}
 		// check if records with this id exist
@@ -156,8 +149,11 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 	}
 
 	private void clear(long time,SQLiteDatabase db) {
+		Calendar calendar  = Calendar.getInstance();
+		calendar.setTimeInMillis(time);
+		calendar.add(Calendar.DATE,-3);
 		// delete the records whose time flag is earlier than the given time
-		db.delete(TBL_NAME, WHEN + "<" + time + " AND " + CATEGORY + " = "
+		db.delete(TBL_NAME, WHEN + "<" + calendar.getTimeInMillis() + " AND " + CATEGORY + " = "
 				+ RepeatCategory.NONE.getId(), null);
 	}
 	public List<NotificationData> query(long time){
@@ -186,8 +182,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 			Calendar cal = Calendar.getInstance();
 			int index = c.getColumnIndex(WHEN);
 			if (index != -1) {
-				cal.setTimeInMillis(c.getLong(index));
-				n.setWhen(new Day(cal));
+				n.setWhen(c.getLong(index));
 			}
 			index = c.getColumnIndex(WHAT);
 			if (index != -1) {
@@ -234,9 +229,7 @@ public class NotifyDatabase extends SQLiteOpenHelper {
 		NotificationData n = new NotificationData();
 		int index = c.getColumnIndex(WHEN);
 		if (index != -1) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTimeInMillis(c.getLong(index));
-			n.setWhen(new Day(cal));
+			n.setWhen(c.getLong(index));
 		}
 		index = c.getColumnIndex(WHAT);
 		if (index != -1) {

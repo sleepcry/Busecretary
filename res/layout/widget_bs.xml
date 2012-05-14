@@ -5,12 +5,12 @@
     android:orientation="horizontal" 
     >
 
-    <Button
+   <!--  <Button
         android:id="@+id/btn_widget_previous"
         android:layout_width="60dip"
         android:layout_height="60dip"
         android:layout_gravity="center"
-        android:background="@drawable/arrow_button_left" />
+        android:background="@drawable/arrow_button_left" /> -->
 
     <TextView
         android:id="@+id/tv_widget_content"
@@ -21,11 +21,11 @@
         android:clickable="true"
         android:text="notification message" />
 
-    <Button
+    <!-- <Button
         android:id="@+id/btn_widget_next"
         android:layout_width="60dip"
         android:layout_height="60dip"
         android:layout_gravity="center"
-        android:background="@drawable/arrow_button_right"/>
+        android:background="@drawable/arrow_button_right"/> -->
 
 </LinearLayout>

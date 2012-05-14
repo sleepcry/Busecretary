@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import utils.LOG;
-import utils.MathUtils;
-import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -62,6 +59,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.chaos.sleepcry.busecretary.GlobalSettings;
 import com.chaos.sleepcry.busecretary.PaneAnimation;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.append.AppendActivity;
@@ -76,6 +74,9 @@ import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard.PaintBoardListener;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
+import com.chaos.sleepcry.busecretary.utils.LOG;
+import com.chaos.sleepcry.busecretary.utils.MathUtils;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
 
 public class CanvasEditActivity extends Activity implements OnTouchListener,
 		ColorPickerDialog.OnColorChangedListener, ColorProvider,
@@ -560,51 +561,6 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mPb.clear();
 			mPb.invalidateAll();
 			return true;
-		case R.id.menushare:
-			File file = Environment
-					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-			if (!file.exists()) {
-				file.mkdirs();
-			}
-			file = new File(
-					Environment
-							.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-					"temp.png");
-			if (file != null && file.exists()) {
-				file.delete();
-				file = new File(
-						Environment
-								.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-						"temp.png");
-			}
-			try {
-				FileOutputStream output = new FileOutputStream(file);
-				mPb.toBitmap().compress(Bitmap.CompressFormat.PNG, 0, output);
-				output.flush();
-				output.close();
-			} catch (IOException e) {
-				LOG.W("ExternalStorage", "Error writing " + file);
-			}
-			try {
-				String url = Media.insertImage(getContentResolver(),
-						file.getAbsolutePath(), file.getName(), file.getName());
-				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-				LOG.D("output", file.getAbsolutePath());
-				Uri screenshotUri = Uri.parse(url);
-				sharingIntent.setType("*/*");
-				// sharingIntent.putExtra(Intent.EXTRA_STREAM,
-				// file.getAbsolutePath());
-				sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
-				sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "DrawingToDo");
-				sharingIntent.putExtra(Intent.EXTRA_TEXT, "DrawingToDo");
-				sharingIntent.putExtra(Intent.EXTRA_TITLE, "DrawingToDo");
-				startActivity(Intent.createChooser(sharingIntent,
-						"Share image using"));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			return true;
 		case R.id.menulayer:
 			showElem();
 			return true;
@@ -883,9 +839,9 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mTempText.setBackgroundColor((~color) | 0xff101010);
 		}
 		if (prefs.contains(AppendActivity.LINE_WIDTH)) {
-			int width = prefs.getInt(AppendActivity.LINE_WIDTH, 3);
+			int width = prefs.getInt(AppendActivity.LINE_WIDTH, GlobalSettings.MIN_LINEWIDTH);
 			if (width <= 0) {
-				width = 1;
+				width = 3;
 			}
 			mPb.setLineWidth(width);
 			mLine.setLineWidth(width);

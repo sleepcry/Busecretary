@@ -71,6 +71,15 @@
 	<string name="empty">empty</string>
 	<string name="config">config</string>
 	<string name="remove">remove</string>
-	<string name="admob_pub_id">a14fa382f645984</string>
+	<string name="admob_pub_id">a14fb0fd670d35e</string>
 	<string name="noweiz">No app can fetch geolocation!</string>
+	<string name="later">later</string>
+	<string name="before">before</string>
+	<string name="second">second</string>
+	<string name="yesterday">yesterday</string>
+	<string name="beforeyesterday">the day before yesterday</string>
+	<string name="tomorrow">tomorrow</string>
+	<string name="aftertomorrow">the day after tomorrow</string>
+	<string name="hinttrigger">Prompt</string>
+	<string name="sounds">Sound</string>
 </resources>

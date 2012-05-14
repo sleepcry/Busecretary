@@ -1,6 +1,5 @@
 package com.chaos.sleepcry.busecretary.canvasedit;
 
-import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,6 +13,7 @@ import android.widget.RadioButton;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.mydraw.MyPolyLine;
 import com.chaos.sleepcry.busecretary.mydraw.PaintBoard;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
 
 public class Settings extends Activity {
 	public static final int BLUR = 0x1;

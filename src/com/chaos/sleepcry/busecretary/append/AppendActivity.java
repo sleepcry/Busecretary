@@ -2,7 +2,6 @@ package com.chaos.sleepcry.busecretary.append;
 
 import java.util.Calendar;
 
-import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chaos.sleepcry.busecretary.BusecretaryActivity;
+import com.chaos.sleepcry.busecretary.GlobalSettings;
 import com.chaos.sleepcry.busecretary.R;
 import com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity;
 import com.chaos.sleepcry.busecretary.mydraw.MyDrawable;
@@ -33,6 +33,7 @@ import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle;
 import com.chaos.sleepcry.busecretary.mydraw.ShakeShuffle.ShakeShuffleListener;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
 import com.google.ads.AdRequest;
 import com.google.ads.AdView;
 
@@ -45,6 +46,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	public static final String LINE_WIDTH = "lw";
 	public static final String LINE_STYLE = "ls";
 	public static final String HINT = "hint";
+	public static final String SOUND = "sd";
 	public static final String SHAREPREF = "com.chaos.sleepcry.busecretary.append.AppendActivity";
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		AdView adView = (AdView) findViewById(R.id.adView);
 		adView.loadAd(new AdRequest());
 
-		if (need_hint) {
+		if (GlobalSettings.need_hint) {
 			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
 					R.drawable.hint);
 			mPb.setHint(new MyDrawable(new BitmapDrawable(bmp), new RectF(0, 0,
@@ -175,16 +177,21 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 			new AlertDialog.Builder(this)
 			.setTitle(R.string.menusetting)
 			.setIcon(android.R.drawable.ic_menu_info_details)
-			.setMultiChoiceItems(R.array.settings,new boolean[] {need_hint},new OnMultiChoiceClickListener() {
+			.setMultiChoiceItems(R.array.settings,new boolean[] {
+					GlobalSettings.need_hint,GlobalSettings.need_sound},
+					new OnMultiChoiceClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 					switch(which) {
 					case 0:
-						need_hint = isChecked;
-						dialog.dismiss();
+						GlobalSettings.need_hint = isChecked;
+						break;
+					case 1:
+						GlobalSettings.need_sound = isChecked;
 						break;
 					}
+					dialog.dismiss();
 				}
 			}).show();
 			return true;
@@ -206,8 +213,6 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 		}
 	}
 
-	private boolean need_hint = true;
-
 	protected void loadPrefs() {
 		SharedPreferences prefs = this.getSharedPreferences(SHAREPREF, 0);
 		if (prefs.contains(COLOR)) {
@@ -215,7 +220,7 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 			mPb.setColor(color);
 		}
 		if (prefs.contains(LINE_WIDTH)) {
-			int width = prefs.getInt(LINE_WIDTH, 3);
+			int width = prefs.getInt(LINE_WIDTH, GlobalSettings.MIN_LINEWIDTH);
 			if (width <= 0) {
 				width = 1;
 			}
@@ -226,7 +231,10 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 			mPb.setPaint(style);
 		}
 		if (prefs.contains(AppendActivity.HINT)) {
-			need_hint = prefs.getBoolean(AppendActivity.HINT, true);
+			GlobalSettings.need_hint = prefs.getBoolean(AppendActivity.HINT, true);
+		}
+		if (prefs.contains(AppendActivity.SOUND)) {
+			GlobalSettings.need_sound = prefs.getBoolean(AppendActivity.SOUND, true);
 		}
 	}
 
@@ -238,7 +246,8 @@ public class AppendActivity extends Activity implements ShakeShuffleListener {
 	protected void savePref() {
 		Editor editor = getSharedPreferences(AppendActivity.SHAREPREF, 0)
 				.edit();
-		editor.putBoolean(AppendActivity.HINT, need_hint);
+		editor.putBoolean(AppendActivity.HINT, GlobalSettings.need_hint);
+		editor.putBoolean(AppendActivity.SOUND, GlobalSettings.need_sound);
 		editor.commit();
 	}
 

@@ -32,11 +32,6 @@
     </item>
     
     <item
-        android:id="@+id/menushare"
-        android:title="@string/menushare"
-        android:icon="@drawable/share">
-    </item>
-    <item
         android:id="@+id/menusetting"
         android:title="@string/menusetting"
         android:icon="@drawable/settings">

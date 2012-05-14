@@ -1,4 +1,4 @@
-package utils;
+package com.chaos.sleepcry.busecretary.utils;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
@@ -6,7 +6,7 @@ import android.content.Context;
 import android.util.Log;
 
 public class LOG {
-	public static boolean enableLog = true;
+	public static boolean enableLog = false;
 	
 	public static void D(String tag, String msg) {
 		if(enableLog) {

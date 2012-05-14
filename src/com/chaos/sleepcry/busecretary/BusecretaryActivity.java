@@ -1,5 +1,9 @@
 package com.chaos.sleepcry.busecretary;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -7,9 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import utils.LOG;
-import utils.MathUtils;
-import utils.SmartMediaPlayer;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -18,12 +19,15 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore.Images.Media;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -45,6 +49,9 @@ import android.widget.Toast;
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
 import com.chaos.sleepcry.busecretary.notify.NotifyDatabase;
 import com.chaos.sleepcry.busecretary.notify.NotifyReceiver;
+import com.chaos.sleepcry.busecretary.utils.LOG;
+import com.chaos.sleepcry.busecretary.utils.MathUtils;
+import com.chaos.sleepcry.busecretary.utils.SmartMediaPlayer;
 
 public class BusecretaryActivity extends Activity implements OnClickListener,
 		OnTouchListener {
@@ -209,8 +216,25 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 		case R.id.remove:
 			removeCurrent();
 			break;
-		case R.id.config:
-			break;
+		case R.id.menushare:
+			if(mCurNoti == null)break;
+			try {
+				String url = Media.insertImage(getContentResolver(),
+						mCurNoti.getBmpPath(), mCurNoti.getWhat(), mCurNoti.getWhat());
+				Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+				Uri screenshotUri = Uri.parse(url);
+				sharingIntent.setType("image/png");
+				sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+				sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "DrawingToDo");
+				sharingIntent.putExtra(Intent.EXTRA_TEXT, mCur.getDescription(mCurNoti));
+				sharingIntent.putExtra(Intent.EXTRA_TITLE, "DrawingToDo");
+				startActivity(Intent.createChooser(sharingIntent,
+						"Share image using"));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			return true;
 		default:
 			break;
 		}
@@ -354,10 +378,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 			switch (id) {
 			// when
 			case OperationAdapter.WHEN:
-				Calendar cal = mCurNoti.getWhen().getCalendar();
-				mdpv = new DatePickerView(this,
-						cal != null ? cal.getTimeInMillis()
-								: System.currentTimeMillis());
+				mdpv = new DatePickerView(this,mCurNoti.getWhen());
 				new AlertDialog.Builder(this)
 						.setView(mdpv)
 						.setPositiveButton(android.R.string.ok,
@@ -365,9 +386,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										Calendar cal = Calendar.getInstance();
-										cal.setTimeInMillis(mdpv.getTime());
-										mCurNoti.getWhen().setCalendar(cal);
+										mCurNoti.setWhen(mdpv.getTime());
 										updateUI();
 									}
 
@@ -440,8 +459,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 		// process the current notification
 		if (mCurNoti != null && mLstNotis.indexOf(mCurNoti) == -1) {
 			// mCurNoti.setWhat(mCur.getDesc());
-			if (mCurNoti.getWhen().getCalendar().getTimeInMillis() <= System
-					.currentTimeMillis()) {
+			if (mCurNoti.getWhen() <= System.currentTimeMillis()) {
 				Toast.makeText(this, "the time is in the past!",
 						Toast.LENGTH_SHORT).show();
 			}
@@ -449,8 +467,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 			// the time interval the alarm will be launched
 			long interval = 0;
 			// the time when to start the alarm
-			long triggerTime = mCurNoti.getWhen().getCalendar()
-					.getTimeInMillis();
+			long triggerTime = mCurNoti.getWhen();
 
 			if (triggerTime > System.currentTimeMillis()) {
 				/*
@@ -460,14 +477,15 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 						NotifyReceiver.class);
 				Bundle bundle = new Bundle();
 				bundle.putString(NotifyDatabase.WHAT, mCurNoti.getWhat());
-				bundle.putLong(NotifyDatabase.WHEN, mCurNoti.getWhen()
-						.getCalendar().getTimeInMillis());
+				bundle.putLong(NotifyDatabase.WHEN, mCurNoti.getWhen());
 				bundle.putString(NotifyDatabase.WHERE, mCurNoti.getWhere());
 				bundle.putString(NotifyDatabase.RING, mCurNoti.getRing());
 				bundle.putString(NotifyDatabase.BMP, mCurNoti.getBmpPath());
+				bundle.putInt(NotifyDatabase.ID, mCurNoti.getId());
+				bundle.putInt(NotifyDatabase.CATEGORY, mCurNoti.getRepeatCategory().getId());
 				intent.putExtras(bundle);
 				LOG.D("notification", "what?:" + mCurNoti.getWhat());
-				LOG.D("notification", "when?" + mCurNoti.getWhen().getString());
+				LOG.D("notification", "when?" + mCurNoti.getWhen());
 				LOG.D("notification", "where?" + mCurNoti.getWhere());
 				LOG.D("notification", "ring?" + mCurNoti.getRing());
 				LOG.D("notification", "bmp?" + mCurNoti.getBmpPath());
@@ -515,8 +533,7 @@ public class BusecretaryActivity extends Activity implements OnClickListener,
 			/*
 			 * save the current notification
 			 */
-			mDB.insert(mCurNoti.getId(), mCurNoti.getWhen().getCalendar()
-					.getTimeInMillis(), mCurNoti.getWhat(), mCurNoti.getRing(),
+			mDB.insert(mCurNoti.getId(), mCurNoti.getWhen(), mCurNoti.getWhat(), mCurNoti.getRing(),
 					mCurNoti.getRepeatCategory().getId(), null,
 					mCurNoti.getWhere());
 			// synchronize the list

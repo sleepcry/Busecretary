@@ -3,7 +3,6 @@ package com.chaos.sleepcry.busecretary;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.LOG;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.graphics.Color;
@@ -16,6 +15,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import com.chaos.sleepcry.busecretary.notify.NotificationData;
+import com.chaos.sleepcry.busecretary.utils.LOG;
+import com.chaos.sleepcry.busecretary.utils.TimeUtils;
 
 public class OperationAdapter extends BaseAdapter {
 
@@ -30,6 +31,7 @@ public class OperationAdapter extends BaseAdapter {
 	BusecretaryActivity mCtxt;
 	List<InfoObj> lstData = null;
 	ArrayList<ArrayList<InfoObj>> lstAllData = null;
+	TimeUtils mMyUtils = null;
 	
 
 	public OperationAdapter(BusecretaryActivity context) {
@@ -48,6 +50,7 @@ public class OperationAdapter extends BaseAdapter {
 		layer1.add(new InfoObj("repeat?",REPEAT));
 		layer1.add(new InfoObj("search?",SEARCH));
 		lstAllData.add(layer1);
+		mMyUtils = new TimeUtils(context);
 	}
 
 	public void setData(NotificationData data) {
@@ -130,7 +133,8 @@ public class OperationAdapter extends BaseAdapter {
 			LOG.D("NotificationData","list " +lstData.get(position).toString());
 			switch (lstData.get(position).id) {
 			case WHEN:
-				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.when)+str2 + mData.getWhen().getString()));
+				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.when)+str2 + 
+						mMyUtils.timeString(mData.getWhen())));
 				break;
 			case WHERE:
 				btn.setText(Html.fromHtml(str1+mCtxt.getString(R.string.where)+str2 + mData.getWhere()));

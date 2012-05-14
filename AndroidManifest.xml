@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.chaos.sleepcry.busecretary"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="3"
+    android:versionName="1.0.2" >
     <uses-sdk android:minSdkVersion="8" />
     <application
         android:icon="@drawable/todo4"
@@ -14,10 +14,7 @@
             android:theme="@android:style/Theme.Black">
         </activity>
         <activity
-            android:name="com.chaos.sleepcry.busecretary.notify.NotifyActivity"
-            android:finishOnTaskLaunch="true"
-            android:multiprocess="false"
-            android:noHistory="true" >
+            android:name="com.chaos.sleepcry.busecretary.notify.NotifyActivity" >
         </activity>
         <activity
             android:name="com.chaos.sleepcry.busecretary.loading.LoadingActivity"
@@ -40,7 +37,7 @@
         </activity>
         <activity android:name="com.chaos.sleepcry.busecretary.canvasedit.CanvasEditActivity" >
         </activity>
-        <receiver android:name="com.chaos.sleepcry.busecretary.notify.NotifyReceiver" >
+        <receiver android:name=".notify.NotifyReceiver" >
             <intent-filter>
                 <action android:name="com.chaos.sleepcry.NEXT" />
             </intent-filter>
