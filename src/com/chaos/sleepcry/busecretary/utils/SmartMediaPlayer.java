@@ -14,11 +14,15 @@ public class SmartMediaPlayer {
 
 	public static SmartMediaPlayer create(Context context, int resid) {
 		SmartMediaPlayer player = new SmartMediaPlayer();
-		player.mPlayer = MediaPlayer.create(context, resid);
-		player.mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-		player.mPlayer.setOnCompletionListener(player.mOnCompleteListener);
-		player.mAm = (AudioManager) context
-				.getSystemService(Context.AUDIO_SERVICE);
+		try {
+			player.mPlayer = MediaPlayer.create(context, resid);
+			player.mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			player.mPlayer.setOnCompletionListener(player.mOnCompleteListener);
+			player.mAm = (AudioManager) context
+					.getSystemService(Context.AUDIO_SERVICE);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return player;
 	}
 
@@ -27,13 +31,16 @@ public class SmartMediaPlayer {
 	}
 
 	public void pause() {
-		if (GlobalSettings.need_sound) {
+		if (GlobalSettings.need_sound && mPlayer != null) {
 			mPlayer.pause();
 		}
 	}
 
 	public void release() {
-		mPlayer.release();
+		if (mPlayer != null) {
+			mPlayer.release();
+			mPlayer = null;
+		}
 	}
 
 	OnCompletionListener mOnCompleteListener = new OnCompletionListener() {
@@ -46,7 +53,7 @@ public class SmartMediaPlayer {
 	};
 
 	public void start() {
-		if (GlobalSettings.need_sound) {
+		if (GlobalSettings.need_sound && mPlayer != null) {
 			int result = mAm.requestAudioFocus(null,
 					// Use the music stream.
 					AudioManager.STREAM_MUSIC,

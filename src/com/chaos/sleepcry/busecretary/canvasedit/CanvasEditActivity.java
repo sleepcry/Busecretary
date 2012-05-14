@@ -311,7 +311,7 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 										intent.addCategory(Intent.CATEGORY_DEFAULT);
 										intent.addCategory(Intent.CATEGORY_OPENABLE);
 										intent.setType("image/*");
-										startActivityForResult(intent,
+										startActivityForResult(Intent.createChooser(intent,"Select Image with"),
 												GET_IMAGE);
 										break;
 									case 3:
@@ -838,18 +838,19 @@ public class CanvasEditActivity extends Activity implements OnTouchListener,
 			mTempText.setTextColor(color);
 			mTempText.setBackgroundColor((~color) | 0xff101010);
 		}
+		int width = GlobalSettings.MIN_LINEWIDTH;
 		if (prefs.contains(AppendActivity.LINE_WIDTH)) {
-			int width = prefs.getInt(AppendActivity.LINE_WIDTH, GlobalSettings.MIN_LINEWIDTH);
+			width = prefs.getInt(AppendActivity.LINE_WIDTH, GlobalSettings.MIN_LINEWIDTH);
 			if (width <= 0) {
 				width = 3;
 			}
-			mPb.setLineWidth(width);
-			mLine.setLineWidth(width);
-			mTextSize = (int) (Math.sqrt(width) * mMetrics.density * 5);
-			mTempText.setTextSize(mTextSize);
-			mTempView.setTextSize(mTextSize);
-			mSeekBar.setProgress(width);
 		}
+		mPb.setLineWidth(width);
+		mLine.setLineWidth(width);
+		mTextSize = (int) (Math.sqrt(width) * mMetrics.density * 5);
+		mTempText.setTextSize(mTextSize);
+		mTempView.setTextSize(mTextSize);
+		mSeekBar.setProgress(width);
 		if (prefs.contains(AppendActivity.LINE_STYLE)) {
 			int style = prefs.getInt(AppendActivity.LINE_STYLE, 0);
 			mPb.setPaint(style);
